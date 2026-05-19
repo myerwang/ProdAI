@@ -24,6 +24,13 @@ handbook for AI to read**:
 - ❌ Personal blog / notebook
 - ❌ Awesome links list
 
+## Nature (key positioning)
+
+- **NOT a skill library** — not a Claude Code skill / agent / callable tool collection; provides no execution capability
+- **Non-invasive** — does not actively inject behavior into AI; enforces no workflow
+- **Passive reference only** — AI consults this **autonomously** when uncertain or needing standardization during co-development; the author does not mandate consultation
+- **Continuously evolves with tech** — not an unchanging bible; outdated approaches are marked `status: deprecated` or replaced
+
 ## Folder structure (grows on demand)
 
 ```
@@ -31,11 +38,30 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # Tri-lingual intro (always in sync)
 ├── AGENTS.md                                  # AI behavior rules (must read)
 ├── CONTRIBUTING.md                            # Acceptance standards
-└── (topic folders grow as needed in practice)
+└── table/                                     # Table design patterns (8 forms)
+    ├── README.md                              # Index + decision tree
+    ├── 01_offset_table/                       # Standard offset pagination
+    ├── 02_cursor_pagination/                  # Cursor / keyset pagination
+    ├── 03_infinite_scroll/                    # Infinite scroll
+    ├── 04_virtual_scroll/                     # Virtual scroll
+    ├── 05_editable_data_grid/                 # Excel-like data grid
+    ├── 06_tree_table/                         # Tree table (nested)
+    ├── 07_pivot_table/                        # Pivot table
+    └── 08_server_side_row_model/              # Server-side row model (>1M)
 ```
 
 Folders are **created on demand**: only when a third related document arrives.
 No pre-created empty folders.
+
+## Current content
+
+### [`table/`](./table/) — Table design patterns
+
+Eight production-grade table forms: Offset / Cursor / Infinite Scroll / Virtual Scroll /
+Editable Data Grid / Tree / Pivot / Server-Side Row Model. Each form includes pseudocode,
+library recommendations, and pitfalls.
+
+Start from [table/README.md](./table/README.md)'s decision tree.
 
 ## Must-reads for AI collaborators
 

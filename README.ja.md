@@ -22,6 +22,13 @@ ProdAI はチュートリアルでも awesome リストでもない。**AI** が
 - ❌ 個人ブログ / 個人ノート
 - ❌ awesome リンク集
 
+## 性質（重要な位置付け）
+
+- **skill ライブラリではない** — Claude Code skill / agent / 呼び出し可能ツール集合ではない、実行機能を提供しない
+- **非侵入型** — AI の行動に能動的に注入しない、いかなるワークフローも強制しない
+- **受動的な参照資料のみ** — AI が協働開発で迷い、標準化が必要な時に**自主的に**参照する。作者は参照を強要しない
+- **技術進化と共に継続調整** — 不変の聖典ではない。陳腐化した方案は `status: deprecated` マーク或いは更新置換
+
 ## フォルダ構造（オンデマンドで grow）
 
 ```
@@ -29,11 +36,30 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三語簡介（常に同期）
 ├── AGENTS.md                                  # AI 行動規則（必読）
 ├── CONTRIBUTING.md                            # 内容収録基準
-└── （トピックフォルダは実戦に応じて grow）
+└── table/                                     # テーブル設計パターン（8 形式）
+    ├── README.md                              # 索引 + 判断ツリー
+    ├── 01_offset_table/                       # 標準 offset 分頁
+    ├── 02_cursor_pagination/                  # cursor / keyset 分頁
+    ├── 03_infinite_scroll/                    # 無限スクロール
+    ├── 04_virtual_scroll/                     # 仮想スクロール
+    ├── 05_editable_data_grid/                 # Excel-like データグリッド
+    ├── 06_tree_table/                         # ツリーテーブル（ネスト）
+    ├── 07_pivot_table/                        # ピボットテーブル
+    └── 08_server_side_row_model/              # サーバーサイド行モデル（>1M）
 ```
 
 フォルダは**オンデマンド作成**: 3 つ目の関連文書が来た時に初めてフォルダ化する。
 事前に空フォルダを作らない。
+
+## 現在の内容
+
+### [`table/`](./table/) — テーブル設計パターン
+
+8 種類のプロダクション級 table 形式: Offset / Cursor / Infinite Scroll /
+Virtual Scroll / Editable Data Grid / Tree / Pivot / Server-Side Row Model。
+各形式に疑似コード、ライブラリ推奨、pitfalls 含む。
+
+[table/README.md](./table/README.md) の判断ツリーから参照を開始する。
 
 ## AI 協働者必読
 

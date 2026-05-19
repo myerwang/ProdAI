@@ -19,6 +19,13 @@ ProdAI 不是教程，也不是 awesome 列表。它是给 **AI** 看的「生�
 - ❌ 个人博客 / 笔记本
 - ❌ awesome 链接列表
 
+## 性质（关键定位）
+
+- **不是 skill 库** — 不是 Claude Code skill / agent / 可调用工具集合，不提供执行能力
+- **非侵入型** — 不主动注入 AI 的行为、不强制任何工作流
+- **只是被动参考** — AI 协作开发遇到困惑、需要标准化时**自主**查阅，作者不强求查阅
+- **随技术演进持续调整** — 不是一成不变的圣经，过时方案会标记 `status: deprecated` 或更新替换
+
 ## 文件夹结构（按需 grow）
 
 ```
@@ -26,10 +33,28 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三语简介（必须同步）
 ├── AGENTS.md                                  # AI 行为规则（必读）
 ├── CONTRIBUTING.md                            # 内容收录标准
-└── （主题文件夹随实战 grow）
+└── table/                                     # 表格设计模式（8 种形式）
+    ├── README.md                              # 索引 + 决策树
+    ├── 01_offset_table/                       # 标准 offset 分页
+    ├── 02_cursor_pagination/                  # cursor / keyset 分页
+    ├── 03_infinite_scroll/                    # 无限滚动
+    ├── 04_virtual_scroll/                     # 虚拟滚动
+    ├── 05_editable_data_grid/                 # Excel-like 数据网格
+    ├── 06_tree_table/                         # 树形表（嵌套）
+    ├── 07_pivot_table/                        # 透视表
+    └── 08_server_side_row_model/              # 服务端行模型（>1M）
 ```
 
 文件夹**按需创建**：第 3 份相关文档时才建文件夹。事前不预设空目录。
+
+## 当前内容
+
+### [`table/`](./table/) — 表格设计模式
+
+8 种生产级 table 形式：Offset / Cursor / Infinite Scroll / Virtual Scroll /
+Editable Data Grid / Tree / Pivot / Server-Side Row Model。每种含伪代码、库推荐、pitfalls。
+
+从 [table/README.md](./table/README.md) 开始查阅决策树。
 
 ## AI 协作者必读
 
