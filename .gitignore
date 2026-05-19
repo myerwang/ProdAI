@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# AI tool 私有設定（仓库には AGENTS.md のみコミット、ローカル AI tool 用は除外）
+.claude/
+.cursorrules
+.aider.conf.yml
+.continuerc
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+Thumbs.db
