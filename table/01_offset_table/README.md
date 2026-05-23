@@ -79,11 +79,14 @@ For total count:
 SELECT COUNT(*) FROM tbl WHERE filters...
 ```
 
-## Representative libraries
+## References
 
-- **shadcn/ui Data Table** (`shadcn-ui/ui`, 80k+ stars) — paste-and-own, TanStack-based
-- **Ant Design Table** (`ant-design/ant-design`, 90k+ overall) — full-featured, China-favored
-- **MUI X DataGrid** (`mui/mui-x`) — Material design, partial paid
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [shadcn-ui/ui](https://github.com/shadcn-ui/ui) — ~115k★: copy-and-own data table, TanStack-based
+- [ant-design/ant-design](https://github.com/ant-design/ant-design) — ~98k★: full-featured Table with offset paging + total count
+- [mui/material-ui](https://github.com/mui/material-ui) — ~98k★: Table + TablePagination (Material design)
+- [mui/mui-x](https://github.com/mui/mui-x) — ~5.7k★: MUI X DataGrid (advanced features, partly paid)
 
 ## Pitfalls / Anti-patterns
 

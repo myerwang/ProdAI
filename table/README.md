@@ -63,6 +63,15 @@ special needs?
 
 ---
 
+## References convention
+
+Per `../AGENTS.md` §3.6, **every form's README must cite ≥1 GitHub OSS repo with
+> 5,000★** in a `## References` section, with the star count **measured** (GitHub API)
+and a `verified <date>` stamp. No armchair invention — research is grounded in real
+high-star implementations. Stars drift; a reference dropping below 5,000★ is swapped at
+the next review. The "Best Lib" column above is a quick pointer; the per-form `## References`
+sections hold the verified detail.
+
 ## How to extend
 
 When a 3rd document about a sub-pattern of one form arrives, create deeper folders:
@@ -83,3 +92,6 @@ See `../CONTRIBUTING.md` §3 for the on-demand folder rule.
 ## History
 
 - **2026-05-19**: Initial taxonomy. 8 forms indexed, each in its own folder.
+- **2026-05-23**: Added a verified `## References` section to all 8 forms (≥1 OSS > 5,000★,
+  stars measured via GitHub API). Dropped/relabeled sub-5k claims (SlickGrid ~2k,
+  virtua ~3.6k, PivotTable.js ~4.4k); fixed `react-data-grid` URL to `Comcast/`.

@@ -90,12 +90,14 @@ GET /api/tree/:nodeId/children → [Node]
 SELECT * FROM tbl WHERE path LIKE 'a/b/c/%' AND depth = 4
 ```
 
-## Representative libraries
+## References
 
-- **AG Grid** — `treeData` + grouping, strongest implementation, paid Enterprise for huge trees
-- **Ant Design Table** — `expandable` + `childrenColumnName`, batteries-included
-- **TanStack Table** — `getRowCanExpand` + `subRows`, headless, you control rendering
-- **React Aria** (`adobe/react-spectrum`) — accessibility-first, low-level primitives
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [ant-design/ant-design](https://github.com/ant-design/ant-design) — ~98k★: Table `expandable` + `childrenColumnName`, batteries-included
+- [TanStack/table](https://github.com/TanStack/table) — ~28k★: `getRowCanExpand` + `subRows`, headless, you control rendering
+- [adobe/react-spectrum](https://github.com/adobe/react-spectrum) — ~15k★: React Aria, accessibility-first tree primitives
+- [ag-grid/ag-grid](https://github.com/ag-grid/ag-grid) — ~15k★: `treeData` + grouping + lazy children (Enterprise for huge trees)
 
 ## Pitfalls / Anti-patterns
 

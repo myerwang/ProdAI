@@ -55,13 +55,16 @@ rows render, positioned via `transform: translateY(...)`.
 For variable row heights, lib stores measured heights in a cache and recalculates
 offsets on resize.
 
-## Representative libraries
+## References
 
-- **react-window** (`bvaughn/react-window`, 16k+) — lightweight, fixed row height, simplest
-- **react-virtualized** (`bvaughn/react-virtualized`, 15k+) — full-featured, variable height, heavier API
-- **TanStack Virtual** (`TanStack/virtual`, 5k+) — headless, framework-agnostic (React/Vue/Solid/Svelte)
-- **virtua** (`inokawa/virtua`, 3k+) — newer, best perf on React 18+, simpler API
-- **vue-virtual-scroller** — Vue ecosystem standard
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [bvaughn/react-virtualized](https://github.com/bvaughn/react-virtualized) — ~27k★: full-featured, variable height, heavier API
+- [bvaughn/react-window](https://github.com/bvaughn/react-window) — ~17k★: lightweight successor, fixed row height, simplest
+- [Akryum/vue-virtual-scroller](https://github.com/Akryum/vue-virtual-scroller) — ~11k★: Vue ecosystem standard
+- [TanStack/virtual](https://github.com/TanStack/virtual) — ~6.9k★: headless, framework-agnostic (React/Vue/Solid/Svelte)
+
+Below 5k★ (not a primary reference): `inokawa/virtua` ~3.6k — newer, strong perf on React 18+, simpler API.
 
 ## Pitfalls / Anti-patterns
 

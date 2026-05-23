@@ -84,13 +84,17 @@ function DataGrid<T>(props):
       )
 ```
 
-## Representative libraries
+## References
 
-- **Handsontable** (`handsontable/handsontable`, 21k+) — best Excel feel, formulas, merged cells, partial commercial license
-- **Glide Data Grid** (`glideapps/glide-data-grid`, 6k+) — Canvas-rendered, 1M+ rows smooth, React-only
-- **AG Grid Community** (`ag-grid/ag-grid`, 14k+) — full-featured grid; Excel export needs Enterprise
-- **react-data-grid** (`adazzle/react-data-grid`, 7k+) — lighter open-source alternative
-- **Slick Grid** (`6pac/SlickGrid`, 6k+) — classic, jQuery-era veteran still maintained
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [handsontable/handsontable](https://github.com/handsontable/handsontable) — ~22k★: best Excel feel, formulas, merged cells (partly commercial)
+- [ag-grid/ag-grid](https://github.com/ag-grid/ag-grid) — ~15k★: full-featured grid; Excel export needs Enterprise
+- [Comcast/react-data-grid](https://github.com/Comcast/react-data-grid) — ~7.6k★: lighter open-source alternative (repo moved from `adazzle/`)
+- [mui/mui-x](https://github.com/mui/mui-x) — ~5.7k★: MUI X DataGrid editable cells
+- [glideapps/glide-data-grid](https://github.com/glideapps/glide-data-grid) — ~5.2k★: Canvas-rendered, 1M+ rows smooth, React-only
+
+Below 5k★ (not a primary reference): `6pac/SlickGrid` ~2k — classic jQuery-era veteran, still maintained.
 
 ## Pitfalls / Anti-patterns
 

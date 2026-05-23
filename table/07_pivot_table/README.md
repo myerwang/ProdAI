@@ -82,13 +82,15 @@ WITH ROLLUP  -- or CUBE for full cross-products
 
 Then front-end only pivots the result (small matrix).
 
-## Representative libraries
+## References
 
-- **AG Grid Enterprise** — pivoting + row grouping + aggregation, industry standard, paid
-- **PivotTable.js** (`nicolaskruchten/pivottable`, 4k+) — open source, jQuery-era but maintained
-- **Apache Superset** — full BI tool with pivot
-- **Metabase** — open-source BI, includes pivot
-- **DevExtreme PivotGrid** — commercial alternative
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [apache/superset](https://github.com/apache/superset) — ~73k★: BI platform, pivot table viz over server-aggregated data
+- [metabase/metabase](https://github.com/metabase/metabase) — ~47k★: open-source BI, includes pivot
+- [ag-grid/ag-grid](https://github.com/ag-grid/ag-grid) — ~15k★: pivoting + row grouping + aggregation (Enterprise, industry standard)
+
+Below 5k★ (not a primary reference): `nicolaskruchten/pivottable` ~4.4k — open source, jQuery-era but maintained.
 
 ## Pitfalls / Anti-patterns
 

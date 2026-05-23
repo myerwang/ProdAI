@@ -94,12 +94,16 @@ This uses a B-tree index on `(sort_col DESC, id DESC)` for O(log N) seek to curs
 Cursor format: `<sort_value>,<id>` encoded as opaque string. Always use composite key
 (at minimum `(timestamp, id)`) to handle ties at identical sort values.
 
-## Representative libraries
+## References
 
-- **TanStack Table v8** (`TanStack/table`, 28k+) — headless, you wire cursor state yourself
-- **Relay** (`facebook/relay`) — GraphQL Connection / edges spec, cursor-first by design
-- **Apollo Client** — supports cursor pagination via `fetchMore`
-- No standalone cursor table library exists — typically self-built atop headless
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [TanStack/query](https://github.com/TanStack/query) — ~49k★: `useInfiniteQuery` with cursors, the data layer
+- [TanStack/table](https://github.com/TanStack/table) — ~28k★: headless table, wire cursor state yourself
+- [apollographql/apollo-client](https://github.com/apollographql/apollo-client) — ~20k★: cursor pagination via `fetchMore`
+- [facebook/relay](https://github.com/facebook/relay) — ~19k★: GraphQL Connection / edges spec, cursor-first by design
+
+No standalone "cursor table" widget exists — built atop a headless table + a cursor-aware data layer.
 
 ## Pitfalls / Anti-patterns
 

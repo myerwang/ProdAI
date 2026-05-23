@@ -75,6 +75,7 @@ Start from [table/README.md](./table/README.md)'s decision tree.
 - ✅ **Pseudocode** examples (AI-readable, convertible to any language)
 - ✅ Clear "when to use / when NOT to use" guidance
 - ✅ Must include a "pitfalls / anti-patterns" section
+- ✅ **Each form must cite ≥1 high-star (>5,000★) GitHub reference — no armchair invention** (measured stars + verified date)
 - ❌ Anything business-project-related: project names, table names, API paths, URLs,
    credentials, personal information
 - ❌ Specific tech stack syntax (React / Rust concrete syntax)
@@ -97,3 +98,4 @@ TBD (decide before going public)
 ## Version
 
 - 2026-05-19 — Initial skeleton
+- 2026-05-23 — New standard: each form must cite ≥1 high-star (>5,000★) GitHub reference, no armchair invention; backfilled References into all 8 table forms

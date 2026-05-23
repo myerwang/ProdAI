@@ -83,6 +83,24 @@ last_reviewed: 2026-05-19
 ---
 ```
 
+### 1.6 High-Star GitHub Reference (mandatory, ≥1 per form)
+
+Every **form / pattern** must cite **at least one OSS repo with > 5,000 GitHub stars**.
+
+- **No armchair invention (闭门造车).** Research and the early collection phase must be
+  grounded in high-star OSS — verify "what the industry does" against real implementations
+  before writing it down.
+- Each doc must have a `## References` section, one entry per line:
+  ```markdown
+  ## References
+  - [owner/repo](https://github.com/owner/repo) — ~98k★ (verified 2026-05-23): one-line use
+  ```
+- Star counts drift. **Measure via GitHub API / official page** before writing, and append
+  `verified <date>`. **Fabricated URLs or guessed star counts are a §1-level violation.**
+- A reference that drops below 5,000★ gets swapped for a higher-star alternative at the next review.
+- If no OSS implementation above 5,000★ exists for a form, it does not meet the bar
+  (not yet an "industry-standard production pattern") — skip it or consult the user.
+
 ---
 
 ## 2. Adding Process
@@ -99,11 +117,13 @@ last_reviewed: 2026-05-19
 1. **AI proposes** — "This looks like a ProdAI candidate (topic: X)"
 2. **Strip business info** — Replace all business names with generic placeholders
 3. **Convert to pseudocode** — No language-specific syntax
-4. **User confirms** — Get explicit OK
-5. **Write to appropriate location** (see §3 folder structure)
-6. **Update tri-lingual READMEs** if structure changed (README.md / README.ja.md / README.en.md)
-7. **Commit** — Automatic OK
-8. **Push** — Must announce to user (auto-push is not allowed)
+4. **Attach measured high-star references** — Per §1.6, find a > 5,000★ OSS for each form,
+   measure stars via GitHub API, write a `## References` section with `verified <date>`. No fabrication.
+5. **User confirms** — Get explicit OK
+6. **Write to appropriate location** (see §3 folder structure)
+7. **Update tri-lingual READMEs** if structure changed (README.md / README.ja.md / README.en.md)
+8. **Commit** — Automatic OK
+9. **Push** — Must announce to user (auto-push is not allowed)
 
 ---
 
@@ -180,3 +200,4 @@ ProdAI is **currently private**. Before making public:
 ## History
 
 - **2026-05-19** Initial version. Defined acceptance standards, adding process, folder structure rules.
+- **2026-05-23** Added §1.6 (mandatory high-star GitHub reference, > 5,000★ per form, no armchair invention) and a measured-reference step in §2.2. Backfilled References into all 8 table forms.

@@ -88,12 +88,15 @@ EXPLAIN (FORMAT JSON) SELECT * FROM tbl WHERE filter
 -- (return null for totalCount until last page detected)
 ```
 
-## Representative libraries
+## References
 
-- **AG Grid Enterprise (Server-Side Row Model)** — the production-grade option, paid
-- **Self-built**: TanStack Table + react-window + backend keyset endpoint + streaming
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
 
-No mature open-source equivalent. AG Grid Enterprise dominates this niche.
+- [TanStack/table](https://github.com/TanStack/table) — ~28k★: headless; pair with virtualization + a backend keyset endpoint to build the row model yourself
+- [bvaughn/react-window](https://github.com/bvaughn/react-window) — ~17k★: viewport virtualization for the thin-client viewer
+- [ag-grid/ag-grid](https://github.com/ag-grid/ag-grid) — ~15k★: Server-Side Row Model (the canonical implementation; Enterprise)
+
+No mature pure-OSS equivalent for the full SSRM; AG Grid Enterprise dominates this niche.
 
 ## Pitfalls / Anti-patterns
 

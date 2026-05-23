@@ -65,13 +65,14 @@ function InfiniteScrollList<T>(props):
     if error: retry button
 ```
 
-## Representative libraries
+## References
 
-- **react-infinite-scroll-component** — small React wrapper, simple
-- **TanStack Virtual** (`TanStack/virtual`, 5k+) — headless, combines infinite + virtual
-- **react-query / TanStack Query** — `useInfiniteQuery` hook abstracts cursor + pages
-- **Flutter ListView.builder** — built-in, with `ScrollController` for end detection
-- **React Native FlatList** — built-in `onEndReached` + `onEndReachedThreshold`
+High-star OSS implementations (stars verified 2026-05-23 via GitHub API; ≥5,000★ bar):
+
+- [flutter/flutter](https://github.com/flutter/flutter) — ~176k★: `ListView.builder` + `ScrollController` end-detection (mobile)
+- [facebook/react-native](https://github.com/facebook/react-native) — ~126k★: `FlatList` `onEndReached` / `onEndReachedThreshold` (mobile)
+- [TanStack/query](https://github.com/TanStack/query) — ~49k★: `useInfiniteQuery` abstracts cursor + pages
+- [TanStack/virtual](https://github.com/TanStack/virtual) — ~6.9k★: headless, pairs windowing with infinite loading
 
 ## Pitfalls / Anti-patterns
 

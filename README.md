@@ -67,6 +67,7 @@ Editable Data Grid / Tree / Pivot / Server-Side Row Model。每种含伪代码�
 - ✅ **伪代码**示例（AI 可读、可转任何语言）
 - ✅ 「何时用 / 何时不用」清晰说明
 - ✅ 必须有「pitfalls / anti-pattern」section
+- ✅ **每个方式必须附 ≥1 个 GitHub 高星（>5,000★）参考，禁止闭门造车**（实测星数 + verified 日期）
 - ❌ 任何业务项目相关：项目名、表名、API 路径、URL、凭据、个人信息
 - ❌ 特定技术栈代码（React / Rust 具体语法）
 
@@ -88,3 +89,4 @@ TBD（公开前决定）
 ## 版本
 
 - 2026-05-19 — 初版骨架
+- 2026-05-23 — 新增收录标准：每个方式必须附 ≥1 个 GitHub 高星（>5,000★）参考，禁止闭门造车；8 种 table 形式遡及补全 References

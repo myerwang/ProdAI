@@ -72,6 +72,7 @@ Virtual Scroll / Editable Data Grid / Tree / Pivot / Server-Side Row Model。
 - ✅ **疑似コード**サンプル（AI が読めて任意言語に変換可能）
 - ✅ 「いつ使う / いつ使わない」明確な説明
 - ✅ 必ず「pitfalls / アンチパターン」セクションを含む
+- ✅ **各方式に GitHub 高star（>5,000★）参考を ≥1 件必須、闭门造车禁止**（star 実測 + verified 日付）
 - ❌ 業務プロジェクト関連: プロジェクト名、テーブル名、API パス、URL、凭据、個人情報
 - ❌ 特定技術スタックのコード（React / Rust 具体構文）
 
@@ -93,3 +94,4 @@ TBD（公開前に決定）
 ## バージョン
 
 - 2026-05-19 — 初版骨格
+- 2026-05-23 — 収録基準追加: 各方式に GitHub 高star（>5,000★）参考 ≥1 件必須、闭门造车禁止; 8 種 table 形式に References を遡及付与
