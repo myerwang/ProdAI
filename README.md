@@ -33,19 +33,29 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三语简介（必须同步）
 ├── AGENTS.md                                  # AI 行为规则（必读）
 ├── CONTRIBUTING.md                            # 内容收录标准
-└── table/                                     # 表格设计模式（8 种形式）
+├── table/                                     # 表格设计模式（8 种形式）
+│   ├── README.md                              # 索引 + 决策树
+│   ├── 01_offset_table/                       # 标准 offset 分页
+│   ├── 02_cursor_pagination/                  # cursor / keyset 分页
+│   ├── 03_infinite_scroll/                    # 无限滚动
+│   ├── 04_virtual_scroll/                     # 虚拟滚动
+│   ├── 05_editable_data_grid/                 # Excel-like 数据网格
+│   ├── 06_tree_table/                         # 树形表（嵌套）
+│   ├── 07_pivot_table/                        # 透视表
+│   └── 08_server_side_row_model/              # 服务端行模型（>1M）
+└── auth/                                      # 认证模式（6 种形式）
     ├── README.md                              # 索引 + 决策树
-    ├── 01_offset_table/                       # 标准 offset 分页
-    ├── 02_cursor_pagination/                  # cursor / keyset 分页
-    ├── 03_infinite_scroll/                    # 无限滚动
-    ├── 04_virtual_scroll/                     # 虚拟滚动
-    ├── 05_editable_data_grid/                 # Excel-like 数据网格
-    ├── 06_tree_table/                         # 树形表（嵌套）
-    ├── 07_pivot_table/                        # 透视表
-    └── 08_server_side_row_model/              # 服务端行模型（>1M）
+    ├── 01_session_cookie.md                   # 服务端 session + cookie（有状态）
+    ├── 02_jwt.md                              # JWT 无状态令牌
+    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委托 / 联合登录
+    ├── 04_api_key.md                          # API Key / PAT（机器对机器）
+    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys 无密码
+    └── 06_refresh_token_rotation.md           # 刷新令牌轮换 / 会话生命周期
 ```
 
-文件夹**按需创建**：第 3 份相关文档时才建文件夹。事前不预设空目录。
+文件夹**按需创建**：散发单篇先放根目录，第 3 份相关文档时才建文件夹，事前不预设空目录。
+**例外**：已识别为成体系的多形式主题（如 `table/`、`auth/`），则一开始就建目录、像 `table/`
+一样把热门生产级形式一次性全收录（详见 `AGENTS.md` §2.3）。
 
 ## 当前内容
 
@@ -55,6 +65,13 @@ ProdAI/
 Editable Data Grid / Tree / Pivot / Server-Side Row Model。每种含伪代码、库推荐、pitfalls。
 
 从 [table/README.md](./table/README.md) 开始查阅决策树。
+
+### [`auth/`](./auth/) — 认证模式
+
+6 种生产级认证形式：Session+Cookie / JWT / OAuth2-OIDC / API Key / WebAuthn-Passkeys /
+Refresh Token Rotation。每种含伪代码、pitfalls、实测高星参考。
+
+从 [auth/README.md](./auth/README.md) 开始查阅决策树（先看「有状态 vs 无状态」）。
 
 ## AI 协作者必读
 
@@ -90,3 +107,4 @@ TBD（公开前决定）
 
 - 2026-05-19 — 初版骨架
 - 2026-05-23 — 新增收录标准：每个方式必须附 ≥1 个 GitHub 高星（>5,000★）参考，禁止闭门造车；8 种 table 形式遡及补全 References
+- 2026-05-23 — 新增 `auth/` 认证模式主题（6 种形式全收录，实测高星参考）；确立「成体系多形式主题一开始就建目录全收录」手順（AGENTS.md §2.3）

@@ -36,20 +36,30 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三語簡介（常に同期）
 ├── AGENTS.md                                  # AI 行動規則（必読）
 ├── CONTRIBUTING.md                            # 内容収録基準
-└── table/                                     # テーブル設計パターン（8 形式）
+├── table/                                     # テーブル設計パターン（8 形式）
+│   ├── README.md                              # 索引 + 判断ツリー
+│   ├── 01_offset_table/                       # 標準 offset 分頁
+│   ├── 02_cursor_pagination/                  # cursor / keyset 分頁
+│   ├── 03_infinite_scroll/                    # 無限スクロール
+│   ├── 04_virtual_scroll/                     # 仮想スクロール
+│   ├── 05_editable_data_grid/                 # Excel-like データグリッド
+│   ├── 06_tree_table/                         # ツリーテーブル（ネスト）
+│   ├── 07_pivot_table/                        # ピボットテーブル
+│   └── 08_server_side_row_model/              # サーバーサイド行モデル（>1M）
+└── auth/                                      # 認証パターン（6 形式）
     ├── README.md                              # 索引 + 判断ツリー
-    ├── 01_offset_table/                       # 標準 offset 分頁
-    ├── 02_cursor_pagination/                  # cursor / keyset 分頁
-    ├── 03_infinite_scroll/                    # 無限スクロール
-    ├── 04_virtual_scroll/                     # 仮想スクロール
-    ├── 05_editable_data_grid/                 # Excel-like データグリッド
-    ├── 06_tree_table/                         # ツリーテーブル（ネスト）
-    ├── 07_pivot_table/                        # ピボットテーブル
-    └── 08_server_side_row_model/              # サーバーサイド行モデル（>1M）
+    ├── 01_session_cookie.md                   # サーバー session + cookie（有状態）
+    ├── 02_jwt.md                              # JWT ステートレストークン
+    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委譲 / 連合ログイン
+    ├── 04_api_key.md                          # API Key / PAT（マシン間）
+    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys パスワードレス
+    └── 06_refresh_token_rotation.md           # リフレッシュトークン回転 / セッション寿命
 ```
 
-フォルダは**オンデマンド作成**: 3 つ目の関連文書が来た時に初めてフォルダ化する。
-事前に空フォルダを作らない。
+フォルダは**オンデマンド作成**: 散発的な単発はまず根に置き、3 つ目の関連文書が来た時に
+フォルダ化する。事前に空フォルダを作らない。
+**例外**: 成熟した多形式タクソノミーと最初から認識できる topic（`table/`、`auth/` 等）は、
+最初からフォルダを作り `table/` 同様に人気生産級形式を一気に全収録する（`AGENTS.md` §2.3 参照）。
 
 ## 現在の内容
 
@@ -60,6 +70,13 @@ Virtual Scroll / Editable Data Grid / Tree / Pivot / Server-Side Row Model。
 各形式に疑似コード、ライブラリ推奨、pitfalls 含む。
 
 [table/README.md](./table/README.md) の判断ツリーから参照を開始する。
+
+### [`auth/`](./auth/) — 認証パターン
+
+6 種類のプロダクション級認証形式: Session+Cookie / JWT / OAuth2-OIDC / API Key /
+WebAuthn-Passkeys / Refresh Token Rotation。各形式に疑似コード、pitfalls、実測高star 参考含む。
+
+[auth/README.md](./auth/README.md) の判断ツリー（まず「有状態 vs ステートレス」）から開始する。
 
 ## AI 協働者必読
 
@@ -95,3 +112,4 @@ TBD（公開前に決定）
 
 - 2026-05-19 — 初版骨格
 - 2026-05-23 — 収録基準追加: 各方式に GitHub 高star（>5,000★）参考 ≥1 件必須、闭门造车禁止; 8 種 table 形式に References を遡及付与
+- 2026-05-23 — `auth/` 認証パターン topic を追加（6 形式を全収録、実測高star 参考）; 「成熟した多形式タクソノミーは最初からフォルダ全収録」手順を確立（AGENTS.md §2.3）

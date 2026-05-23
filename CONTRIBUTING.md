@@ -152,6 +152,27 @@ ProdAI/
 
 Folder names: topic-based, lowercase, snake_case if needed (`table`, `database`, `pagination`, `ai_collaboration`, `state_management`).
 
+### 3.1 Recognized multi-form taxonomy → create the folder upfront, collect ALL forms (the `table/` way)
+
+The on-demand rule above is for **scattered, one-off documents**. When a topic is recognized
+from the start as a mature **multi-form production taxonomy**, do NOT dribble single files —
+**create the topic folder immediately and comprehensively collect the popular production-grade
+forms in one pass**, exactly like `table/` (8 forms). This is the §0 "do it right in one shot" mindset.
+
+Trigger (all three must hold):
+1. You can enumerate **≥3 production-grade forms** upfront
+2. Each form has a real **OSS implementation with > 5,000★** (satisfies §1.6)
+3. There is a **decision axis** between forms (a decision tree can be written)
+
+What to produce (mirror `table/`):
+- `<topic>/README.md` — index + decision tree + summary table (a "Best Lib" column per form)
+- `<topic>/NN_<form>.md` — one file per form, each complete with metadata / when-to-use /
+  pseudocode / pitfalls / `## References` (≥1 measured > 5,000★, verified date)
+
+Example: JWT is not a topic — it is **one form of the `auth` topic**. So don't create a lone
+`jwt.md`; create `auth/` and collect session-cookie / JWT / OAuth2-OIDC / API key / WebAuthn
+(passkeys) etc. together.
+
 ---
 
 ## 4. README Sync Checklist
@@ -201,3 +222,4 @@ ProdAI is **currently private**. Before making public:
 
 - **2026-05-19** Initial version. Defined acceptance standards, adding process, folder structure rules.
 - **2026-05-23** Added §1.6 (mandatory high-star GitHub reference, > 5,000★ per form, no armchair invention) and a measured-reference step in §2.2. Backfilled References into all 8 table forms.
+- **2026-05-23** Added §3.1 (recognized multi-form taxonomy → create folder upfront and collect all forms, the `table/` way). E.g. JWT goes into a comprehensive `auth/` topic, not a lone file.

@@ -38,20 +38,31 @@ ProdAI/
 ├── README.md / README.ja.md / README.en.md   # Tri-lingual intro (always in sync)
 ├── AGENTS.md                                  # AI behavior rules (must read)
 ├── CONTRIBUTING.md                            # Acceptance standards
-└── table/                                     # Table design patterns (8 forms)
+├── table/                                     # Table design patterns (8 forms)
+│   ├── README.md                              # Index + decision tree
+│   ├── 01_offset_table/                       # Standard offset pagination
+│   ├── 02_cursor_pagination/                  # Cursor / keyset pagination
+│   ├── 03_infinite_scroll/                    # Infinite scroll
+│   ├── 04_virtual_scroll/                     # Virtual scroll
+│   ├── 05_editable_data_grid/                 # Excel-like data grid
+│   ├── 06_tree_table/                         # Tree table (nested)
+│   ├── 07_pivot_table/                        # Pivot table
+│   └── 08_server_side_row_model/              # Server-side row model (>1M)
+└── auth/                                      # Auth patterns (6 forms)
     ├── README.md                              # Index + decision tree
-    ├── 01_offset_table/                       # Standard offset pagination
-    ├── 02_cursor_pagination/                  # Cursor / keyset pagination
-    ├── 03_infinite_scroll/                    # Infinite scroll
-    ├── 04_virtual_scroll/                     # Virtual scroll
-    ├── 05_editable_data_grid/                 # Excel-like data grid
-    ├── 06_tree_table/                         # Tree table (nested)
-    ├── 07_pivot_table/                        # Pivot table
-    └── 08_server_side_row_model/              # Server-side row model (>1M)
+    ├── 01_session_cookie.md                   # Server session + cookie (stateful)
+    ├── 02_jwt.md                              # JWT stateless token
+    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC delegated / federated
+    ├── 04_api_key.md                          # API Key / PAT (machine-to-machine)
+    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys passwordless
+    └── 06_refresh_token_rotation.md           # Refresh token rotation / session lifecycle
 ```
 
-Folders are **created on demand**: only when a third related document arrives.
-No pre-created empty folders.
+Folders are **created on demand**: a scattered one-off starts at root, and a folder forms
+only when a third related document arrives. No pre-created empty folders.
+**Exception**: a topic recognized upfront as a mature multi-form taxonomy (`table/`, `auth/`, …)
+gets its folder immediately and collects the popular production-grade forms in one pass,
+the `table/` way (see `AGENTS.md` §2.3).
 
 ## Current content
 
@@ -62,6 +73,14 @@ Editable Data Grid / Tree / Pivot / Server-Side Row Model. Each form includes ps
 library recommendations, and pitfalls.
 
 Start from [table/README.md](./table/README.md)'s decision tree.
+
+### [`auth/`](./auth/) — Auth patterns
+
+Six production-grade authentication forms: Session+Cookie / JWT / OAuth2-OIDC / API Key /
+WebAuthn-Passkeys / Refresh Token Rotation. Each form includes pseudocode, pitfalls, and
+measured high-star references.
+
+Start from [auth/README.md](./auth/README.md)'s decision tree (begin with "stateful vs stateless").
 
 ## Must-reads for AI collaborators
 
@@ -99,3 +118,4 @@ TBD (decide before going public)
 
 - 2026-05-19 — Initial skeleton
 - 2026-05-23 — New standard: each form must cite ≥1 high-star (>5,000★) GitHub reference, no armchair invention; backfilled References into all 8 table forms
+- 2026-05-23 — Added the `auth/` topic (6 forms collected upfront, with measured high-star references); established the "recognized multi-form taxonomy → create folder upfront" procedure (AGENTS.md §2.3)
