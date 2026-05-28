@@ -430,4 +430,3 @@ Access-Control-Allow-Headers: Content-Type, Upload-Length, Upload-Offset, Upload
 高星开源实现（星数已验证 2026-05-28 通过 GitHub API；≥5,000★ 标准）：
 
 - [transloadit/uppy](https://github.com/transloadit/uppy) — ~31k★ (verified 2026-05-28): 生产级 tus 客户端实现，@uppy/tus 插件支持恢复、暂停、取消，提供 fingerprint 和 localStorage 持久化
-- [tus/tus-js-client](https://github.com/tus/tus-js-client) — ~6.2k★ (verified 2026-05-28): tus 官方 JavaScript 客户端库，核心 resumable 实现参考
