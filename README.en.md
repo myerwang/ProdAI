@@ -56,17 +56,27 @@ ProdAI/
 │   ├── 04_api_key.md                          # API Key / PAT (machine-to-machine)
 │   ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys passwordless
 │   └── 06_refresh_token_rotation.md           # Refresh token rotation / session lifecycle
-└── form/                                      # Form patterns (9 forms)
-    ├── README.md                              # Index + decision tree + cross-cutting layer
-    ├── 01_single_form.md                      # Single-page form (controlled/uncontrolled + schema)
-    ├── 02_multistep_wizard.md                 # Multi-step wizard / stepper
-    ├── 03_dynamic_field_array.md              # Dynamic field array (add/remove rows)
-    ├── 04_conditional_survey_form.md          # Conditional / survey (skip logic)
-    ├── 05_schema_driven_form.md               # Schema-driven / server-driven form
-    ├── 06_inline_edit.md                      # Inline edit (capability)
-    ├── 07_autosave_draft.md                   # Autosave / draft (capability)
-    ├── 08_search_filter_form.md               # Search / filter form
-    └── 09_file_upload_form.md                 # File upload (chunked / resumable)
+├── form/                                      # Form patterns (9 forms)
+│   ├── README.md                              # Index + decision tree + cross-cutting layer
+│   ├── 01_single_form.md                      # Single-page form (controlled/uncontrolled + schema)
+│   ├── 02_multistep_wizard.md                 # Multi-step wizard / stepper
+│   ├── 03_dynamic_field_array.md              # Dynamic field array (add/remove rows)
+│   ├── 04_conditional_survey_form.md          # Conditional / survey (skip logic)
+│   ├── 05_schema_driven_form.md               # Schema-driven / server-driven form
+│   ├── 06_inline_edit.md                      # Inline edit (capability)
+│   ├── 07_autosave_draft.md                   # Autosave / draft (capability)
+│   ├── 08_search_filter_form.md               # Search / filter form
+│   └── 09_file_upload_form.md                 # File upload field (→ pointer to upload/)
+└── upload/                                     # Upload patterns (8 forms)
+    ├── README.md                              # Index + decision tree + summary
+    ├── 01_server_proxied_multipart.md         # Server-proxied multipart (≤5MB / must traverse app)
+    ├── 02_presigned_direct_put.md             # Presigned URL direct PUT (5–100MB)
+    ├── 03_multipart_parallel_parts.md         # Multipart parallel parts (>100MB / abortable)
+    ├── 04_resumable_tus.md                    # tus resumable protocol (flaky / cross-session)
+    ├── 05_client_preprocessing.md             # Client preprocessing (resize / HEIC / EXIF / hash)
+    ├── 06_background_offline_queue.md         # Background offline queue (SW + IndexedDB / PWA)
+    ├── 07_streaming_server_ingestion.md       # Streaming server ingestion (proxy + memory-bound)
+    └── 08_post_upload_pipeline.md             # Post-upload pipeline (thumbnails / scan / transcode)
 ```
 
 Folders are **created on demand**: a scattered one-off starts at root, and a folder forms
@@ -102,6 +112,18 @@ covered as a cross-cutting layer inside each form. Each includes pseudocode, pit
 measured high-star references.
 
 Start from [form/README.md](./form/README.md)'s decision tree (begin with "is the field set known at build time?").
+
+### [`upload/`](./upload/) — Upload patterns
+
+Eight production-grade upload forms: Server-Proxied Multipart / Presigned Direct PUT /
+Multipart Parallel Parts / Resumable tus / Client Preprocessing / Background Offline Queue /
+Streaming Server Ingestion / Post-Upload Pipeline. Covers images, files, video, and binary
+blobs across four axes: frontend / backend / client preprocessing / server-side derivation.
+`form/09_file_upload_form.md` is reduced to a pointer for "use as a form field"; the actual
+transfer mechanics live in this directory. Each form includes pseudocode, pitfalls, and
+measured high-star references.
+
+Start from [upload/README.md](./upload/README.md)'s decision tree (file size first, then layer in orthogonal concerns).
 
 ## Must-reads for AI collaborators
 
@@ -141,3 +163,4 @@ TBD (decide before going public)
 - 2026-05-23 — New standard: each form must cite ≥1 high-star (>5,000★) GitHub reference, no armchair invention; backfilled References into all 8 table forms
 - 2026-05-23 — Added the `auth/` topic (6 forms collected upfront, with measured high-star references); established the "recognized multi-form taxonomy → create folder upfront" procedure (AGENTS.md §2.3)
 - 2026-05-28 — Added the `form/` topic (9 forms collected upfront: Single / Wizard / Field Array / Conditional-Survey / Schema-driven / Inline Edit / Autosave / Search-Filter / File Upload; state management & validation as a cross-cutting layer); references measured 2026-05-28
+- 2026-05-28 — Added the `upload/` topic (8 forms collected upfront: Server-Proxied Multipart / Presigned Direct PUT / Multipart Parallel Parts / Resumable tus / Client Preprocessing / Background Offline Queue / Streaming Server Ingestion / Post-Upload Pipeline); `form/09_file_upload_form.md` shrunk to an `upload/` pointer; references measured 2026-05-28

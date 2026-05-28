@@ -51,17 +51,27 @@ ProdAI/
 │   ├── 04_api_key.md                          # API Key / PAT（机器对机器）
 │   ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys 无密码
 │   └── 06_refresh_token_rotation.md           # 刷新令牌轮换 / 会话生命周期
-└── form/                                      # 表单模式（9 种形式）
-    ├── README.md                              # 索引 + 决策树 + 跨切层
-    ├── 01_single_form.md                      # 单页表单（受控/非受控 + schema 校验）
-    ├── 02_multistep_wizard.md                 # 多步向导 / stepper
-    ├── 03_dynamic_field_array.md              # 动态字段数组（可增删行）
-    ├── 04_conditional_survey_form.md          # 条件分支 / 问卷（skip logic）
-    ├── 05_schema_driven_form.md               # Schema 驱动 / 服务端驱动表单
-    ├── 06_inline_edit.md                      # 行内编辑（capability）
-    ├── 07_autosave_draft.md                   # 自动保存 / 草稿（capability）
-    ├── 08_search_filter_form.md               # 搜索 / 筛选表单
-    └── 09_file_upload_form.md                 # 文件上传表单（分片 / 断点续传）
+├── form/                                      # 表单模式（9 种形式）
+│   ├── README.md                              # 索引 + 决策树 + 跨切层
+│   ├── 01_single_form.md                      # 单页表单（受控/非受控 + schema 校验）
+│   ├── 02_multistep_wizard.md                 # 多步向导 / stepper
+│   ├── 03_dynamic_field_array.md              # 动态字段数组（可增删行）
+│   ├── 04_conditional_survey_form.md          # 条件分支 / 问卷（skip logic）
+│   ├── 05_schema_driven_form.md               # Schema 驱动 / 服务端驱动表单
+│   ├── 06_inline_edit.md                      # 行内编辑（capability）
+│   ├── 07_autosave_draft.md                   # 自动保存 / 草稿（capability）
+│   ├── 08_search_filter_form.md               # 搜索 / 筛选表单
+│   └── 09_file_upload_form.md                 # 文件上传字段（→ upload/ 指针）
+└── upload/                                     # 文件上传模式（8 种形式）
+    ├── README.md                              # 索引 + 决策树 + Summary
+    ├── 01_server_proxied_multipart.md         # 服务端代理 multipart（≤5MB / 必经应用层）
+    ├── 02_presigned_direct_put.md             # 预签名 URL 直传（5–100MB）
+    ├── 03_multipart_parallel_parts.md         # 并行分片 multipart（>100MB / 可中止）
+    ├── 04_resumable_tus.md                    # tus 协议断点续传（弱网 / 跨会话）
+    ├── 05_client_preprocessing.md             # 客户端预处理（resize / HEIC / EXIF / hash）
+    ├── 06_background_offline_queue.md         # 后台离线队列（SW + IndexedDB / PWA）
+    ├── 07_streaming_server_ingestion.md       # 服务端流式 ingestion（必须代理但省内存）
+    └── 08_post_upload_pipeline.md             # 上传后派生流水线（缩略图 / 扫毒 / 转码）
 ```
 
 文件夹**按需创建**：散发单篇先放根目录，第 3 份相关文档时才建文件夹，事前不预设空目录。
@@ -91,6 +101,16 @@ Schema-driven / Inline Edit / Autosave-Draft / Search-Filter / File Upload。主
 状态管理与校验作为「跨切层」在每个 form 内覆盖。每种含伪代码、pitfalls、实测高星参考。
 
 从 [form/README.md](./form/README.md) 开始查阅决策树（先看「字段集是否在构建期已知」）。
+
+### [`upload/`](./upload/) — 文件上传模式
+
+8 种生产级 upload 形式：Server-Proxied Multipart / Presigned Direct PUT / Multipart Parallel
+Parts / Resumable tus / Client Preprocessing / Background Offline Queue / Streaming Server
+Ingestion / Post-Upload Pipeline。载体涵盖图片 / 文件 / 视频 / 二进制 blob；前端 / 后端 /
+客户端预处理 / 服务端派生四轴覆盖。`form/09_file_upload_form.md` 退化为「作为表单字段时如何接入」
+的指针，传输机制完整收录在本目录。每种含伪代码、pitfalls、实测高星参考。
+
+从 [upload/README.md](./upload/README.md) 开始查阅决策树（先按文件大小分流，再叠加 orthogonal layers）。
 
 ## AI 协作者必读
 
@@ -128,3 +148,4 @@ TBD（公开前决定）
 - 2026-05-23 — 新增收录标准：每个方式必须附 ≥1 个 GitHub 高星（>5,000★）参考，禁止闭门造车；8 种 table 形式遡及补全 References
 - 2026-05-23 — 新增 `auth/` 认证模式主题（6 种形式全收录，实测高星参考）；确立「成体系多形式主题一开始就建目录全收录」手順（AGENTS.md §2.3）
 - 2026-05-28 — 新增 `form/` 表单模式主题（9 种形式全收录：单页 / 向导 / 字段数组 / 条件问卷 / Schema 驱动 / 行内编辑 / 自动保存 / 搜索筛选 / 文件上传；状态管理与校验作为跨切层）；References 实测于 2026-05-28
+- 2026-05-28 — 新增 `upload/` 文件上传主题（8 种形式全收录：Server-Proxied Multipart / Presigned Direct PUT / Multipart Parallel Parts / Resumable tus / Client Preprocessing / Background Offline Queue / Streaming Server Ingestion / Post-Upload Pipeline）；`form/09_file_upload_form.md` 收缩为 `upload/` 指针；References 实测于 2026-05-28
