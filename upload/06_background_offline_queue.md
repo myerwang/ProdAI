@@ -220,49 +220,49 @@ function FileUploadWithQueue(props):
 
 ## Backend
 
-本 form 無獨立後端協議。後端 MUST 在 form 01–04 的 finalize 處實現**冪等性**（SW 可能因為響應丟失而重放已成功上傳）。每個排隊上傳必須帶 `Idempotency-Key` header；後端據此判斷"這是新上傳還是重試"——新上傳則存儲、重試則返回先前的成功響應（無副作用）。詳見 form 02/03/04 的 Backend 節及 Idempotency-Key 約定。
+本 form 无独立后端协议。后端 MUST 在 form 01–04 的 finalize 处实现**幂等性**（SW 可能因为响应丢失而重放已成功上传）。每个排队上传必须带 `Idempotency-Key` header；后端据此判断"这是新上传还是重试"——新上传则存储、重试则返回先前的成功响应（无副作用）。详见 form 02/03/04 的 Backend 节及 Idempotency-Key 约定。
 
 ## Contract
 
-繼承所選傳輸 form (01–04) 的 contract。補充：
+继承所选传输 form (01–04) 的 contract。补充：
 
-- **POST /api/uploads** (或其他路由)
-  - Header: `Idempotency-Key: <id>`（UUID，每次上傳固定）
-  - Body: multipart FormData with `file`, `name`, 其他元數據
-  - Response 201: `{id, url, size}` — 同一 Idempotency-Key 重複請求返回**相同響應**，無副作用
-  - Errors: 400 (invalid file), 413 (too large), 409 (quota exceeded)
+- **POST /api/uploads**（或其他路由）
+  - Header：`Idempotency-Key: <id>`（UUID，每次上传固定）
+  - Body：multipart FormData with `file`, `name`, 其他元数据
+  - Response 201：`{id, url, size}` — 同一 Idempotency-Key 重复请求返回**相同响应**，无副作用
+  - Errors：400 (invalid file), 413 (too large), 409 (quota exceeded)
 
-後端必須驗證：
+后端必须验证：
 1. Idempotency-Key 格式有效（UUID）
-2. 同一 key 的重試返回先前成功响應（檢查 idempotency cache）
-3. 新 key 則正常存儲（form 01–04 的邏輯）
+2. 同一 key 的重试返回先前成功响应（检查 idempotency cache）
+3. 新 key 则正常存储（form 01–04 的逻辑）
 
 ## Pitfalls
 
-- ❌ **blob 只在內存持有**：tab 關閉丟失。
-  - **Fix**: enqueue 時持久化 blob 到 IndexedDB。
+- ❌ **blob 仅在内存中持有**：tab 关闭时丢失。
+  - **Fix**：enqueue 时将 blob 持久化到 IndexedDB。
 
-- ❌ **無 idempotency key**：重放時雙創建資源。
-  - **Fix**: enqueue 時生成穩定 UUID，同時用為 `Idempotency-Key` header。
+- ❌ **无幂等性密钥**：重放时重复创建资源。
+  - **Fix**：enqueue 时生成稳定 UUID，同时用作 `Idempotency-Key` header。
 
-- ❌ **隊列無限增長**：死上傳堆積，浪費存儲。
-  - **Fix**: attempts 上限（如 10）→ `state='dead'`；用戶驅動重試或清除。
+- ❌ **队列无限增长**：死上传堆积，浪费存储。
+  - **Fix**：attempts 上限（如 10）→ `state='dead'`；用户驱动重试或清除。
 
-- ❌ **只通過 UI 線程通知**：用戶已關 tab 時，前台卸載導致狀態丟失。
-  - **Fix**: SW 通過 `showNotification()` 在終態（成功/失敗）通知用戶；前台重新打開時通過 BroadcastChannel 同步隊列狀態。
+- ❌ **仅通过 UI 线程通知**：用户已关闭 tab 时，前台卸载导致状态丢失。
+  - **Fix**：SW 通过 `showNotification()` 在终态（成功/失败）通知用户；前台重新打开时通过 BroadcastChannel 同步队列状态。
 
-- ❌ **SW 存儲配額耗盡**：嵌入 blob 且不清理會堆滿 IndexedDB。
-  - **Fix**: 成功上傳立刻 `db.delete(id)`；`navigator.storage.estimate()` 預檢查——剩餘 < 2× 文件大小則拒絕 enqueue。
+- ❌ **SW 存储配额耗尽**：嵌入 blob 且不清理会堆满 IndexedDB。
+  - **Fix**：成功上传立刻 `db.delete(id)`；`navigator.storage.estimate()` 预检查——剩余 < 2× 文件大小则拒绝 enqueue。
 
-- ❌ **重試無上限或無指數退避**：洪泛 API、破壞服務。
-  - **Fix**: 最多 10 次重試，每次 backoff = 30s × (2^attempt - 1)；超過 10 次改為 dead 需人工介入。
+- ❌ **重试无上限或无指数退避**：泛滥 API、破坏服务。
+  - **Fix**：最多 10 次重试，每次 backoff = 30s × (2^attempt - 1)；超过 10 次改为 dead 需人工介入。
 
-- ❌ **前台未訂閱 BroadcastChannel**：SW 完成上傳卻沒人聽，用戶不知道。
-  - **Fix**: 前台掛載時立刻 `subscribeToUploadQueue()`，保持頻道打開（直到卸載）。
+- ❌ **前台未订阅 BroadcastChannel**：SW 完成上传却没人听，用户不知道。
+  - **Fix**：前台挂载时立刻 `subscribeToUploadQueue()`，保持频道打开（直到卸载）。
 
 ## References
 
-高星開源實現（星數已驗證 2026-05-28 通過 GitHub API；≥5,000★ 標準）：
+高星开源实现（星数已验证 2026-05-28 通过 GitHub API；≥5,000★ 标准）：
 
-- [GoogleChrome/workbox](https://github.com/GoogleChrome/workbox) — ~13k★ (verified 2026-05-28): Production-grade Service Worker 工具庫，workbox-background-sync 模塊提供隊列持久化、自動重試、指數退避、幂等註冊
-- [transloadit/uppy](https://github.com/transloadit/uppy) — ~31k★ (verified 2026-05-28): 生產級上傳 UI 組件，Golden Retriever 插件實現跨 tab 持久化與恢復（IndexedDB 存儲、自動重放）
+- [GoogleChrome/workbox](https://github.com/GoogleChrome/workbox) — ~13k★ (verified 2026-05-28)：生产级 Service Worker 工具库，workbox-background-sync 模块提供队列持久化、自动重试、指数退避、幂等注册
+- [transloadit/uppy](https://github.com/transloadit/uppy) — ~31k★ (verified 2026-05-28)：生产级上传 UI 组件，Golden Retriever 插件实现跨 tab 持久化与恢复（IndexedDB 存储、自动重放）
