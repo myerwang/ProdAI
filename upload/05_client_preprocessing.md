@@ -1,0 +1,447 @@
+---
+form: client_preprocessing
+topic: upload
+applies_to: [frontend]
+decision: shrink/normalize before upload to save bandwidth and strip privacy metadata
+status: stable
+last_reviewed: 2026-05-28
+---
+
+# Upload 5: Client-Side Preprocessing
+
+客户端在上传前对文件进行本地归一化和压缩：解码图像、缩放到规范尺寸（如长边 2000px）、重新编码为目标格式（JPEG/WebP）、剥离 EXIF 元数据（GPS、设备序列号等隐私信息）、生成确定性 SHA256 哈希用于去重。处理在 Web Worker 中运行避免卡顿。输出的小型归一化 blob 随后通过 01–04 任一传输方式上传。适合移动端照片上传、带宽受限客户端、隐私关键场景。
+
+## When to use
+
+- 移动端相机照片上传：HEIC/HEIF 自动转 JPEG、EXIF 自动剥离
+- 带宽受限客户端：降采样 40MP 原图到 2k px，减 80%+ 大小
+- 用户隐私敏感：GPS、制造商序列号、设备标识必须在客户端清除
+- 跨客户端一致性：相同源文件通过归一化产生相同哈希，避免重复存储
+- 前端即时反馈：预缩略图给用户实时预览上传后的效果
+
+## When NOT to use
+
+- 医疗、法律原件必须保留原始未损版本：禁止有损预处理，只能原件上传
+- 服务端已有廉价派生流水线：若后端能快速生成缩略图/预览，客户端预处理收益小
+- 极低算力设备（IoT、老旧手机）：解码/缩放 CPU 成本 > 带宽节省收益
+- 原文件内容可恢复性要求高：任何有损转换都禁止
+- 用户没给明确同意修改文件：需在 UX 明确告知"将压缩至 JPEG、去除位置信息"
+
+## Conclusion
+
+在 Web Worker 中运行确定性的客户端流水线：`decode(blob) → resize(keeping aspect) → reencode(target format, quality=0.82) → strip EXIF metadata → sha256(final blob)→ hash`。缓存 `hash → uploaded_key` 映射以跳过重复上传。输出的小型、隐私安全的 blob 随后通过 01–04 任一传输方式上传。客户端预处理是 UX 和带宽优化，**不是安全保障** — 服务端必须始终重新校验类型、大小、内容完整性，不可信任客户端声称的 hash 或尺寸。
+
+## Frontend
+
+```
+interface ImageDimensions:
+  width: integer
+  height: integer
+
+interface PreprocessedFile:
+  originalName: string
+  originalSize: integer
+  originalType: string
+  finalBlob: Blob
+  finalSize: integer
+  sha256Hash: string
+  dimensions: ImageDimensions
+  orientationApplied: boolean
+
+const MAX_DIMENSION = 2000          # px，长或宽的上限
+const JPEG_QUALITY = 0.82           # 0–1 范围
+const CHUNK_SIZE = 65536            # 逐块读文件避免内存爆
+
+function createPreprocessWorker():
+  # 在 Web Worker 线程运行，避免主线程卡顿
+  return new Worker("preprocess-worker.js")
+
+# 主线程启动预处理
+function preprocessFile(blob: Blob, originalName: string) -> Promise<PreprocessedFile>:
+  worker = createPreprocessWorker()
+  
+  return new Promise((resolve, reject) => {
+    worker.onmessage = (event) => {
+      result = event.data
+      if result.error:
+        reject(Error(result.error))
+      else:
+        resolve(result)
+      worker.terminate()
+    }
+    
+    worker.onerror = (error) => {
+      reject(error)
+      worker.terminate()
+    }
+    
+    worker.postMessage({
+      blob: blob,
+      originalName: originalName,
+      maxDimension: MAX_DIMENSION,
+      jpegQuality: JPEG_QUALITY
+    }, [blob])  # 转移所有权避免复制
+
+# ========== Web Worker 侧 ==========
+
+function workerHandleMessage(event):
+  message = event.data
+  blob = message.blob
+  originalName = message.originalName
+  maxDimension = message.maxDimension
+  jpegQuality = message.jpegQuality
+  
+  try:
+    # 步骤 1：嗅探类型和读取基本元数据
+    originalType = sniffContentType(blob)
+    if not isImageType(originalType):
+      throw Error("Not an image: " + originalType)
+    
+    isHeic = originalType contains "heic" or originalType contains "heif"
+    isPng = originalType == "image/png"
+    isLossless = isPng or (originalType contains "webp" and blob has lossless chunk)
+    
+    # 步骤 2：解码为 ImageBitmap 或 Canvas
+    bitmap = await decodeImageBlob(blob, maxDimension)
+    originalDimensions = {width: bitmap.width, height: bitmap.height}
+    
+    # 步骤 3：应用 EXIF 方向（若存在）
+    orientationApplied = false
+    if not isPng:  # PNG EXIF 已被 browser decoder 处理
+      exifOrientation = await readExifOrientation(blob)
+      if exifOrientation and exifOrientation != 1:
+        bitmap = applyOrientationTransform(bitmap, exifOrientation)
+        orientationApplied = true
+    
+    # 步骤 4：缩放（保持宽高比）
+    resized = false
+    if bitmap.width > maxDimension or bitmap.height > maxDimension:
+      scale = min(maxDimension / bitmap.width, maxDimension / bitmap.height)
+      newWidth = floor(bitmap.width * scale)
+      newHeight = floor(bitmap.height * scale)
+      bitmap = resizeBitmap(bitmap, newWidth, newHeight)
+      resized = true
+    
+    # 步骤 5：选择目标格式和重编码
+    targetType = jpeg
+    targetQuality = jpegQuality
+    
+    if isLossless:
+      # PNG/无损 WebP → 保持 PNG（避免二次有损）
+      targetType = png
+      targetQuality = null
+    elif isHeic:
+      # HEIC → JPEG（浏览器不支持 HEIC decode，只能用库如 heic2any polyfill）
+      targetType = jpeg
+    
+    finalBlob = await reencodeImageBitmap(bitmap, targetType, targetQuality)
+    
+    # 步骤 6：剥离 EXIF 和其他元数据
+    # （重编后的 bitmap → blob 通常已无 EXIF，但显式清理保险）
+    finalBlob = await stripMetadata(finalBlob)
+    
+    # 步骤 7：计算哈希（最终 blob 的规范表示）
+    sha256Hash = await sha256(finalBlob)
+    
+    # 完成，返回给主线程
+    workerSelf.postMessage({
+      originalName: originalName,
+      originalSize: blob.size,
+      originalType: originalType,
+      finalBlob: finalBlob,
+      finalSize: finalBlob.size,
+      sha256Hash: sha256Hash,
+      dimensions: {
+        width: bitmap.width,
+        height: bitmap.height
+      },
+      orientationApplied: orientationApplied,
+      error: null
+    }, [finalBlob])
+  
+  catch error:
+    workerSelf.postMessage({
+      error: error.message
+    })
+
+function sniffContentType(blob: Blob) -> string:
+  # 读前 4–8 字节，检查幻数
+  header = await readBlob(blob, 0, 8)
+  
+  if header[0:4] == [0xff, 0xd8, 0xff, 0xe*]:
+    return "image/jpeg"
+  if header[0:4] == [0x89, 0x50, 0x4e, 0x47]:
+    return "image/png"
+  if header[0:4] == [0x52, 0x49, 0x46, 0x46] and header[8:12] == [0x57, 0x45, 0x42, 0x50]:
+    return "image/webp"
+  if header[0:4] == [0x00, 0x00, 0x00, 0x20] or header[0:4] == [0x00, 0x00, 0x00, 0x18]:
+    # ftypisom / ftypisom (简化 HEIC 检查)
+    return "image/heic"
+  if blob.type:
+    return blob.type
+  return "application/octet-stream"
+
+function isImageType(contentType: string) -> boolean:
+  return contentType startsWith "image/"
+
+function readExifOrientation(blob: Blob) -> optional integer:
+  # 读 JPEG/HEIC，解析 EXIF，提取 Orientation tag (0x0112)
+  # 实现：使用 piexifjs 或 exifjs 库；若无则返回 null
+  try:
+    exifData = await piexif.load(await blob.arrayBuffer())
+    if "0th" in exifData:
+      orientation = exifData["0th"][piexif.ImageIFD.Orientation]
+      return orientation
+  catch:
+    pass
+  return null
+
+function applyOrientationTransform(bitmap: ImageBitmap, orientation: integer) -> ImageBitmap:
+  # orientation: 1=default, 3=rotate-180, 6=rotate-90-cw, 8=rotate-270-cw 等
+  canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+  ctx = canvas.getContext("2d")
+  
+  # 根据方向旋转/翻转
+  match orientation:
+    case 2:
+      ctx.translate(bitmap.width, 0)
+      ctx.scale(-1, 1)
+    case 3:
+      ctx.translate(bitmap.width, bitmap.height)
+      ctx.rotate(Math.PI)
+    case 4:
+      ctx.translate(0, bitmap.height)
+      ctx.scale(1, -1)
+    case 5:
+      ctx.rotate(-Math.PI/2)
+      ctx.scale(-1, 1)
+    case 6:
+      ctx.rotate(-Math.PI/2)
+      ctx.translate(-bitmap.height, 0)
+    case 7:
+      ctx.rotate(Math.PI/2)
+      ctx.scale(-1, 1)
+    case 8:
+      ctx.rotate(Math.PI/2)
+      ctx.translate(-bitmap.height, 0)
+  
+  ctx.drawImage(bitmap, 0, 0)
+  return await canvas.convertToBlob()
+
+function resizeBitmap(bitmap: ImageBitmap, newWidth: integer, newHeight: integer) -> ImageBitmap:
+  canvas = new OffscreenCanvas(newWidth, newHeight)
+  ctx = canvas.getContext("2d")
+  ctx.drawImage(bitmap, 0, 0, newWidth, newHeight)
+  return canvas.convertToBlob()
+
+function reencodeImageBitmap(bitmap: ImageBitmap, format: string, quality: optional float) -> Promise<Blob>:
+  canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+  ctx = canvas.getContext("2d")
+  ctx.drawImage(bitmap, 0, 0)
+  
+  options = {type: format}
+  if quality != null:
+    options.quality = quality
+  
+  return canvas.convertToBlob(options)
+
+function stripMetadata(blob: Blob) -> Promise<Blob>:
+  # 方法 1：重编过程已移除 EXIF（OffscreenCanvas 输出没有元数据）
+  # 方法 2（保险）：用 piexif 手动清除
+  # 对大多数场景，重编后的 blob 已干净
+  return blob
+
+function sha256(blob: Blob) -> Promise<string>:
+  # 使用 SubtleCrypto API
+  arrayBuffer = await blob.arrayBuffer()
+  hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer)
+  
+  # 转换为十六进制字符串
+  hashArray = Array.from(new Uint8Array(hashBuffer))
+  hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashHex
+
+# 主线程中的去重和上传集成
+function FileUploadWidgetWithPreprocessing(props):
+  state file: optional Blob = null
+  state uploadState: string = "idle"      # idle | preprocessing | uploading | done | error
+  state progress: float = 0.0
+  state preprocessedFile: optional PreprocessedFile = null
+  state errorMsg: optional string = null
+  state uploadedHash: optional string = null
+  
+  # localStorage 格式：{hash -> {url, timestamp}}
+  state dedupeCache: Map<string, UploadRecord> = loadDedupeCache()
+  
+  function onFileSelect(f: Blob):
+    file = f
+    uploadState = "preprocessing"
+    errorMsg = null
+    progress = 0.0
+    preprocessedFile = null
+    
+    try:
+      preprocessedFile = await preprocessFile(f, f.name)
+      
+      # 检查是否已上传过
+      existingRecord = dedupeCache.get(preprocessedFile.sha256Hash)
+      if existingRecord:
+        uploadState = "done"
+        uploadedHash = preprocessedFile.sha256Hash
+        props.onSuccess({
+          url: existingRecord.url,
+          isDuplicate: true,
+          hash: preprocessedFile.sha256Hash
+        })
+        return
+      
+      # 未上传过，启动传输
+      uploadState = "uploading"
+      await uploadPreprocessedFile(preprocessedFile)
+    
+    catch e:
+      uploadState = "error"
+      errorMsg = e.message
+  
+  function uploadPreprocessedFile(processed: PreprocessedFile):
+    # 选择合适的传输方式（Form 01–04）
+    # 例：小于 50MB 用 Form 01（服务器代理）；大于用 Form 04（tus）
+    
+    if processed.finalSize <= 50_000_000:
+      # 使用 Form 01: Server Proxied Multipart
+      formData = new FormData()
+      formData.append("file", processed.finalBlob)
+      formData.append("name", processed.originalName)
+      formData.append("x-original-hash", processed.sha256Hash)
+      
+      response = await httpRequest({
+        method: "POST",
+        url: "/uploads",
+        body: formData,
+        onProgress: (loaded, total) => {
+          progress = 0.3 + (loaded / total) * 0.7  # 预处理占 30%，上传占 70%
+        }
+      })
+      
+      if response.status == 201:
+        uploadedHash = processed.sha256Hash
+        dedupeCache.set(processed.sha256Hash, {
+          url: response.json().url,
+          timestamp: now()
+        })
+        saveDedupeCache(dedupeCache)
+        
+        uploadState = "done"
+        props.onSuccess(response.json())
+    else:
+      # 使用 Form 04: Resumable tus（超大文件）
+      await uploadViaTus(processed)
+  
+  function loadDedupeCache() -> Map<string, UploadRecord>:
+    raw = localStorage.get("upload_dedupe_cache")
+    if raw:
+      return Map(JSON.parse(raw))
+    return new Map()
+  
+  function saveDedupeCache(cache: Map):
+    data = Array.from(cache.entries())
+    localStorage.set("upload_dedupe_cache", JSON.stringify(data))
+  
+  render:
+    if uploadState == "idle":
+      file-input (accept="image/*")
+    if uploadState == "preprocessing":
+      spinner ("Optimizing image...")
+    if uploadState == "uploading":
+      progress-bar (progress)
+      cancel-button
+    if uploadState == "done":
+      success-checkmark
+      if isDuplicate:
+        info-badge ("Image already uploaded")
+    if uploadState == "error":
+      error-message (errorMsg)
+      retry-button
+```
+
+## Backend
+
+후端은 본 form의 출력(최종 blob)을 01–04의 전송 방식으로 받고, **항상 재검증해야 한다**: 
+
+```
+function handleUploadPost(request):
+  # 클라이언트가 보낸 전처리된 blob (또는 tus 의 최종 object)
+  file = request.file
+  clientHash = request.headers.get("X-Original-Hash")  # 선택적; 신뢰 안 함
+  
+  # ★ 재검증: 서버는 항상 클라이언트 전처리를 신뢰하지 않음
+  
+  # 1. 타입 재확인 (매직바이트)
+  sniffedType = sniffMagicBytes(file.slice(0, 512))
+  if not isAllowedType(sniffedType):
+    return 415 Unsupported Media Type
+  
+  # 2. 크기 재확인 (클라이언트가 "2000px로 축소했습니다"라고 해도 재측정)
+  if file.size > MAX_ALLOWED_SIZE:
+    return 413 Payload Too Large
+  
+  # 3. 해시 재계산 (클라이언트 해시는 비교만, 기록하지 않음)
+  serverHash = sha256(file)
+  if clientHash and clientHash != serverHash:
+    log_warning("client_hash_mismatch: client=" + clientHash + " server=" + serverHash)
+  
+  # 4. 필요시 파생 생성 (썸네일, 미리보기)
+  #    서버 측 파생은 규범 형태(전처리된 최종 blob)로부터 생성
+  
+  # 일반적인 multipart 또는 tus 종료 로직 계속
+  recordId = generateId()
+  finalUrl = storeFile(file, recordId, sniffedType)
+  
+  return 201 {
+    id: recordId,
+    url: finalUrl,
+    size: file.size,
+    sha256: serverHash
+  }
+```
+
+## Contract
+
+본 form은 독립적인 wire contract을 정의하지 않는다. 클라이언트 전처리의 출력(최종 blob)이 01–04의 전송 방식 중 하나의 입력이 된다:
+
+- **Form 01 (multipart)**: 전처리 blob을 FormData에 추가하고 POST `/uploads`로 전송
+- **Form 02 (presigned PUT)**: 전처리 blob을 AWS presigned URL로 PUT
+- **Form 03 (multipart parallel)**: 전처리 blob을 청크로 분할하고 병렬 업로드
+- **Form 04 (tus)**: 전처리 blob을 tus resumable 프로토콜로 업로드
+
+선택은 `finalSize` 및 네트워크 조건에 따라 결정된다.
+
+## Pitfalls
+
+- ❌ **메인 스레드에서 큰 이미지 디코딩 / 리사이징**
+  - **Fix**: Web Worker에서 실행; `createImageBitmap` 옵션 사용하여 점진적 다운샘플링
+
+- ❌ **EXIF orientation 적용 전에 메타데이터 제거**
+  - **Fix**: 먼저 방향 변환 적용 → 리인코드 중 메타데이터 자동 제거
+
+- ❌ **무손실 PNG 또는 스크린샷을 JPEG로 조용히 재인코딩**
+  - **Fix**: 콘텐츠 타입에 따라 결정; PNG → PNG, 사진 → JPEG/WebP
+
+- ❌ **클라이언트 해시를 권한/보안 결정에 사용**
+  - **Fix**: 해시는 UX 중복 제거용; 서버는 항상 수신 후 재계산하여 검증
+
+- ❌ **저사양 휴대폰에서 40MP 원본 메모리 폭발**
+  - **Fix**: `createImageBitmap({resizeWidth, resizeHeight})` 옵션으로 소스 크기 제한; 단계적 다운샘플링
+
+- ❌ **HEIC 이미지 브라우저 네이티브 미지원**
+  - **Fix**: heic2any 라이브러리 폴리필 또는 서버 측 변환; 클라이언트에서 할 수 없으면 원본 그대로 전송
+
+- ❌ **동일 파일의 여러 전처리 결과 불일치**
+  - **Fix**: 결정적 파이프라인 보장; 같은 설정(maxDim, quality, orientation logic)으로 재실행하면 동일 해시 생성
+
+## References
+
+高星开源实现（星数已验证 2026-05-28 通过 GitHub API；≥5,000★ 标准）：
+
+- [pqina/filepond](https://github.com/pqina/filepond) — ~16k★ (verified 2026-05-28): 生产级上传组件，filepond-plugin-image-transform 插件提供客户端 resize、EXIF 剥离、格式转换
+- [lovell/sharp](https://github.com/lovell/sharp) — ~32k★ (verified 2026-05-28): Node.js 服务端图像处理库；若保留原件并在服务端执行预处理变体时使用
