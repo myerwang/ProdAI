@@ -48,14 +48,25 @@ ProdAI/
 │   ├── 06_tree_table/                         # Tree table (nested)
 │   ├── 07_pivot_table/                        # Pivot table
 │   └── 08_server_side_row_model/              # Server-side row model (>1M)
-└── auth/                                      # Auth patterns (6 forms)
-    ├── README.md                              # Index + decision tree
-    ├── 01_session_cookie.md                   # Server session + cookie (stateful)
-    ├── 02_jwt.md                              # JWT stateless token
-    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC delegated / federated
-    ├── 04_api_key.md                          # API Key / PAT (machine-to-machine)
-    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys passwordless
-    └── 06_refresh_token_rotation.md           # Refresh token rotation / session lifecycle
+├── auth/                                      # Auth patterns (6 forms)
+│   ├── README.md                              # Index + decision tree
+│   ├── 01_session_cookie.md                   # Server session + cookie (stateful)
+│   ├── 02_jwt.md                              # JWT stateless token
+│   ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC delegated / federated
+│   ├── 04_api_key.md                          # API Key / PAT (machine-to-machine)
+│   ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys passwordless
+│   └── 06_refresh_token_rotation.md           # Refresh token rotation / session lifecycle
+└── form/                                      # Form patterns (9 forms)
+    ├── README.md                              # Index + decision tree + cross-cutting layer
+    ├── 01_single_form.md                      # Single-page form (controlled/uncontrolled + schema)
+    ├── 02_multistep_wizard.md                 # Multi-step wizard / stepper
+    ├── 03_dynamic_field_array.md              # Dynamic field array (add/remove rows)
+    ├── 04_conditional_survey_form.md          # Conditional / survey (skip logic)
+    ├── 05_schema_driven_form.md               # Schema-driven / server-driven form
+    ├── 06_inline_edit.md                      # Inline edit (capability)
+    ├── 07_autosave_draft.md                   # Autosave / draft (capability)
+    ├── 08_search_filter_form.md               # Search / filter form
+    └── 09_file_upload_form.md                 # File upload (chunked / resumable)
 ```
 
 Folders are **created on demand**: a scattered one-off starts at root, and a folder forms
@@ -81,6 +92,16 @@ WebAuthn-Passkeys / Refresh Token Rotation. Each form includes pseudocode, pitfa
 measured high-star references.
 
 Start from [auth/README.md](./auth/README.md)'s decision tree (begin with "stateful vs stateless").
+
+### [`form/`](./form/) — Form patterns
+
+Nine production-grade form forms: Single / Multi-step Wizard / Dynamic Field Array /
+Conditional-Survey / Schema-driven / Inline Edit / Autosave-Draft / Search-Filter /
+File Upload. Primary axis is UX/architecture shape; state management and validation are
+covered as a cross-cutting layer inside each form. Each includes pseudocode, pitfalls, and
+measured high-star references.
+
+Start from [form/README.md](./form/README.md)'s decision tree (begin with "is the field set known at build time?").
 
 ## Must-reads for AI collaborators
 
@@ -119,3 +140,4 @@ TBD (decide before going public)
 - 2026-05-19 — Initial skeleton
 - 2026-05-23 — New standard: each form must cite ≥1 high-star (>5,000★) GitHub reference, no armchair invention; backfilled References into all 8 table forms
 - 2026-05-23 — Added the `auth/` topic (6 forms collected upfront, with measured high-star references); established the "recognized multi-form taxonomy → create folder upfront" procedure (AGENTS.md §2.3)
+- 2026-05-28 — Added the `form/` topic (9 forms collected upfront: Single / Wizard / Field Array / Conditional-Survey / Schema-driven / Inline Edit / Autosave / Search-Filter / File Upload; state management & validation as a cross-cutting layer); references measured 2026-05-28

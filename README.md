@@ -43,14 +43,25 @@ ProdAI/
 │   ├── 06_tree_table/                         # 树形表（嵌套）
 │   ├── 07_pivot_table/                        # 透视表
 │   └── 08_server_side_row_model/              # 服务端行模型（>1M）
-└── auth/                                      # 认证模式（6 种形式）
-    ├── README.md                              # 索引 + 决策树
-    ├── 01_session_cookie.md                   # 服务端 session + cookie（有状态）
-    ├── 02_jwt.md                              # JWT 无状态令牌
-    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委托 / 联合登录
-    ├── 04_api_key.md                          # API Key / PAT（机器对机器）
-    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys 无密码
-    └── 06_refresh_token_rotation.md           # 刷新令牌轮换 / 会话生命周期
+├── auth/                                      # 认证模式（6 种形式）
+│   ├── README.md                              # 索引 + 决策树
+│   ├── 01_session_cookie.md                   # 服务端 session + cookie（有状态）
+│   ├── 02_jwt.md                              # JWT 无状态令牌
+│   ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委托 / 联合登录
+│   ├── 04_api_key.md                          # API Key / PAT（机器对机器）
+│   ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys 无密码
+│   └── 06_refresh_token_rotation.md           # 刷新令牌轮换 / 会话生命周期
+└── form/                                      # 表单模式（9 种形式）
+    ├── README.md                              # 索引 + 决策树 + 跨切层
+    ├── 01_single_form.md                      # 单页表单（受控/非受控 + schema 校验）
+    ├── 02_multistep_wizard.md                 # 多步向导 / stepper
+    ├── 03_dynamic_field_array.md              # 动态字段数组（可增删行）
+    ├── 04_conditional_survey_form.md          # 条件分支 / 问卷（skip logic）
+    ├── 05_schema_driven_form.md               # Schema 驱动 / 服务端驱动表单
+    ├── 06_inline_edit.md                      # 行内编辑（capability）
+    ├── 07_autosave_draft.md                   # 自动保存 / 草稿（capability）
+    ├── 08_search_filter_form.md               # 搜索 / 筛选表单
+    └── 09_file_upload_form.md                 # 文件上传表单（分片 / 断点续传）
 ```
 
 文件夹**按需创建**：散发单篇先放根目录，第 3 份相关文档时才建文件夹，事前不预设空目录。
@@ -72,6 +83,14 @@ Editable Data Grid / Tree / Pivot / Server-Side Row Model。每种含伪代码�
 Refresh Token Rotation。每种含伪代码、pitfalls、实测高星参考。
 
 从 [auth/README.md](./auth/README.md) 开始查阅决策树（先看「有状态 vs 无状态」）。
+
+### [`form/`](./form/) — 表单模式
+
+9 种生产级 form 形式：Single / Multi-step Wizard / Dynamic Field Array / Conditional-Survey /
+Schema-driven / Inline Edit / Autosave-Draft / Search-Filter / File Upload。主轴为 UX/架构形态，
+状态管理与校验作为「跨切层」在每个 form 内覆盖。每种含伪代码、pitfalls、实测高星参考。
+
+从 [form/README.md](./form/README.md) 开始查阅决策树（先看「字段集是否在构建期已知」）。
 
 ## AI 协作者必读
 
@@ -108,3 +127,4 @@ TBD（公开前决定）
 - 2026-05-19 — 初版骨架
 - 2026-05-23 — 新增收录标准：每个方式必须附 ≥1 个 GitHub 高星（>5,000★）参考，禁止闭门造车；8 种 table 形式遡及补全 References
 - 2026-05-23 — 新增 `auth/` 认证模式主题（6 种形式全收录，实测高星参考）；确立「成体系多形式主题一开始就建目录全收录」手順（AGENTS.md §2.3）
+- 2026-05-28 — 新增 `form/` 表单模式主题（9 种形式全收录：单页 / 向导 / 字段数组 / 条件问卷 / Schema 驱动 / 行内编辑 / 自动保存 / 搜索筛选 / 文件上传；状态管理与校验作为跨切层）；References 实测于 2026-05-28

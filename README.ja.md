@@ -46,14 +46,25 @@ ProdAI/
 │   ├── 06_tree_table/                         # ツリーテーブル（ネスト）
 │   ├── 07_pivot_table/                        # ピボットテーブル
 │   └── 08_server_side_row_model/              # サーバーサイド行モデル（>1M）
-└── auth/                                      # 認証パターン（6 形式）
-    ├── README.md                              # 索引 + 判断ツリー
-    ├── 01_session_cookie.md                   # サーバー session + cookie（有状態）
-    ├── 02_jwt.md                              # JWT ステートレストークン
-    ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委譲 / 連合ログイン
-    ├── 04_api_key.md                          # API Key / PAT（マシン間）
-    ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys パスワードレス
-    └── 06_refresh_token_rotation.md           # リフレッシュトークン回転 / セッション寿命
+├── auth/                                      # 認証パターン（6 形式）
+│   ├── README.md                              # 索引 + 判断ツリー
+│   ├── 01_session_cookie.md                   # サーバー session + cookie（有状態）
+│   ├── 02_jwt.md                              # JWT ステートレストークン
+│   ├── 03_oauth2_oidc.md                      # OAuth2 / OIDC 委譲 / 連合ログイン
+│   ├── 04_api_key.md                          # API Key / PAT（マシン間）
+│   ├── 05_webauthn_passkey.md                 # WebAuthn / Passkeys パスワードレス
+│   └── 06_refresh_token_rotation.md           # リフレッシュトークン回転 / セッション寿命
+└── form/                                      # フォームパターン（9 形式）
+    ├── README.md                              # 索引 + 判断ツリー + 横断レイヤー
+    ├── 01_single_form.md                      # 単一ページフォーム（controlled/uncontrolled + schema 検証）
+    ├── 02_multistep_wizard.md                 # 多段ウィザード / stepper
+    ├── 03_dynamic_field_array.md              # 動的フィールド配列（行の増減）
+    ├── 04_conditional_survey_form.md          # 条件分岐 / アンケート（skip logic）
+    ├── 05_schema_driven_form.md               # Schema 駆動 / サーバー駆動フォーム
+    ├── 06_inline_edit.md                      # インライン編集（capability）
+    ├── 07_autosave_draft.md                   # 自動保存 / 下書き（capability）
+    ├── 08_search_filter_form.md               # 検索 / フィルターフォーム
+    └── 09_file_upload_form.md                 # ファイルアップロード（チャンク / 再開可能）
 ```
 
 フォルダは**オンデマンド作成**: 散発的な単発はまず根に置き、3 つ目の関連文書が来た時に
@@ -77,6 +88,15 @@ Virtual Scroll / Editable Data Grid / Tree / Pivot / Server-Side Row Model。
 WebAuthn-Passkeys / Refresh Token Rotation。各形式に疑似コード、pitfalls、実測高star 参考含む。
 
 [auth/README.md](./auth/README.md) の判断ツリー（まず「有状態 vs ステートレス」）から開始する。
+
+### [`form/`](./form/) — フォームパターン
+
+9 種類のプロダクション級 form 形式: Single / Multi-step Wizard / Dynamic Field Array /
+Conditional-Survey / Schema-driven / Inline Edit / Autosave-Draft / Search-Filter /
+File Upload。主軸は UX/アーキテクチャ形態、状態管理と検証は各 form 内の「横断レイヤー」
+として扱う。各形式に疑似コード、pitfalls、実測高star 参考含む。
+
+[form/README.md](./form/README.md) の判断ツリー（まず「フィールド集合がビルド時に既知か」）から開始する。
 
 ## AI 協働者必読
 
@@ -113,3 +133,4 @@ TBD（公開前に決定）
 - 2026-05-19 — 初版骨格
 - 2026-05-23 — 収録基準追加: 各方式に GitHub 高star（>5,000★）参考 ≥1 件必須、闭门造车禁止; 8 種 table 形式に References を遡及付与
 - 2026-05-23 — `auth/` 認証パターン topic を追加（6 形式を全収録、実測高star 参考）; 「成熟した多形式タクソノミーは最初からフォルダ全収録」手順を確立（AGENTS.md §2.3）
+- 2026-05-28 — `form/` フォームパターン topic を追加（9 形式を全収録: Single / Wizard / Field Array / Conditional-Survey / Schema-driven / Inline Edit / Autosave / Search-Filter / File Upload; 状態管理と検証は横断レイヤー扱い）; References は 2026-05-28 実測
