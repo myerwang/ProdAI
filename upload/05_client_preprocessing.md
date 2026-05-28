@@ -366,34 +366,34 @@ function FileUploadWidgetWithPreprocessing(props):
 
 ## Backend
 
-후端은 본 form의 출력(최종 blob)을 01–04의 전송 방식으로 받고, **항상 재검증해야 한다**: 
+后端通过 01–04 的传输方式接收本 form 的输出（最终 blob），**必须始终重新校验**：
 
 ```
 function handleUploadPost(request):
-  # 클라이언트가 보낸 전처리된 blob (또는 tus 의 최종 object)
+  # 客户端发送的预处理 blob（或 tus 的最终 object）
   file = request.file
-  clientHash = request.headers.get("X-Original-Hash")  # 선택적; 신뢰 안 함
+  clientHash = request.headers.get("X-Original-Hash")  # 可选；不信任
   
-  # ★ 재검증: 서버는 항상 클라이언트 전처리를 신뢰하지 않음
+  # ★ 重新校验：服务器始终不信任客户端预处理
   
-  # 1. 타입 재확인 (매직바이트)
+  # 1. 重新校验类型（magic bytes）
   sniffedType = sniffMagicBytes(file.slice(0, 512))
   if not isAllowedType(sniffedType):
     return 415 Unsupported Media Type
   
-  # 2. 크기 재확인 (클라이언트가 "2000px로 축소했습니다"라고 해도 재측정)
+  # 2. 重新校验大小（即使客户端说"已缩放至 2000px"也要重测）
   if file.size > MAX_ALLOWED_SIZE:
     return 413 Payload Too Large
   
-  # 3. 해시 재계산 (클라이언트 해시는 비교만, 기록하지 않음)
+  # 3. 重新计算哈希（客户端哈希仅用于比较，不记录）
   serverHash = sha256(file)
   if clientHash and clientHash != serverHash:
     log_warning("client_hash_mismatch: client=" + clientHash + " server=" + serverHash)
   
-  # 4. 필요시 파생 생성 (썸네일, 미리보기)
-  #    서버 측 파생은 규범 형태(전처리된 최종 blob)로부터 생성
+  # 4. 必要时生成派生（缩略图、预览）
+  #    服务端派生应从规范形态（预处理的最终 blob）生成
   
-  # 일반적인 multipart 또는 tus 종료 로직 계속
+  # 继续通常的 multipart 或 tus 终止逻辑
   recordId = generateId()
   finalUrl = storeFile(file, recordId, sniffedType)
   
@@ -407,37 +407,37 @@ function handleUploadPost(request):
 
 ## Contract
 
-본 form은 독립적인 wire contract을 정의하지 않는다. 클라이언트 전처리의 출력(최종 blob)이 01–04의 전송 방식 중 하나의 입력이 된다:
+本 form 无独立的 wire contract。客户端预处理的输出（最终 blob）是 01–04 传输方式之一的输入：
 
-- **Form 01 (multipart)**: 전처리 blob을 FormData에 추가하고 POST `/uploads`로 전송
-- **Form 02 (presigned PUT)**: 전처리 blob을 AWS presigned URL로 PUT
-- **Form 03 (multipart parallel)**: 전처리 blob을 청크로 분할하고 병렬 업로드
-- **Form 04 (tus)**: 전처리 blob을 tus resumable 프로토콜로 업로드
+- **Form 01 (multipart)**：将预处理 blob 添加到 FormData，POST 到 `/uploads`
+- **Form 02 (presigned PUT)**：将预处理 blob PUT 到 AWS 预签名 URL
+- **Form 03 (multipart parallel)**：将预处理 blob 分割成块，并行上传
+- **Form 04 (tus)**：通过 tus 可恢复协议上传预处理 blob
 
-선택은 `finalSize` 및 네트워크 조건에 따라 결정된다.
+选择基于 `finalSize` 和网络条件确定。
 
 ## Pitfalls
 
-- ❌ **메인 스레드에서 큰 이미지 디코딩 / 리사이징**
-  - **Fix**: Web Worker에서 실행; `createImageBitmap` 옵션 사용하여 점진적 다운샘플링
+- ❌ **主线程中解码/缩放大型图像**
+  - **Fix**：在 Web Worker 中运行；使用 `createImageBitmap` 选项渐进式降采样
 
-- ❌ **EXIF orientation 적용 전에 메타데이터 제거**
-  - **Fix**: 먼저 방향 변환 적용 → 리인코드 중 메타데이터 자동 제거
+- ❌ **应用 EXIF 方向之前移除元数据**
+  - **Fix**：先应用方向变换 → 重编期间自动移除元数据
 
-- ❌ **무손실 PNG 또는 스크린샷을 JPEG로 조용히 재인코딩**
-  - **Fix**: 콘텐츠 타입에 따라 결정; PNG → PNG, 사진 → JPEG/WebP
+- ❌ **将无损 PNG 或截图无声地重新编码为 JPEG**
+  - **Fix**：根据内容类型决策；PNG → PNG，照片 → JPEG/WebP
 
-- ❌ **클라이언트 해시를 권한/보안 결정에 사용**
-  - **Fix**: 해시는 UX 중복 제거용; 서버는 항상 수신 후 재계산하여 검증
+- ❌ **在授权/安全决策中使用客户端哈希**
+  - **Fix**：哈希仅用于 UX 去重；服务器始终接收后重新计算验证
 
-- ❌ **저사양 휴대폰에서 40MP 원본 메모리 폭발**
-  - **Fix**: `createImageBitmap({resizeWidth, resizeHeight})` 옵션으로 소스 크기 제한; 단계적 다운샘플링
+- ❌ **低端手机上 40MP 原始文件内存爆炸**
+  - **Fix**：使用 `createImageBitmap({resizeWidth, resizeHeight})` 选项限制源大小；分步降采样
 
-- ❌ **HEIC 이미지 브라우저 네이티브 미지원**
-  - **Fix**: heic2any 라이브러리 폴리필 또는 서버 측 변환; 클라이언트에서 할 수 없으면 원본 그대로 전송
+- ❌ **HEIC 图像浏览器原生不支持**
+  - **Fix**：heic2any 库 polyfill 或服务端转换；如果客户端无法处理则原样传输
 
-- ❌ **동일 파일의 여러 전처리 결과 불일치**
-  - **Fix**: 결정적 파이프라인 보장; 같은 설정(maxDim, quality, orientation logic)으로 재실행하면 동일 해시 생성
+- ❌ **同一文件的多个预处理结果不一致**
+  - **Fix**：保证确定性管道；用相同设置（maxDim、quality、orientation logic）重新运行会生成相同哈希
 
 ## References
 
