@@ -2,6 +2,20 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/auto-sync-config.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "claude-hud@claude-hud": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
@@ -16,21 +30,8 @@
       }
     }
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "theme": "dark",
-  "skipAutoPermissionPrompt": true,
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $HOME/.claude/hooks/auto-sync-config.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
+  "skipAutoPermissionPrompt": true
 }
