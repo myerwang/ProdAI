@@ -30,8 +30,9 @@
       }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "max",
   "tui": "fullscreen",
   "theme": "dark",
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "model": "claude-fable-5[1m]"
 }
