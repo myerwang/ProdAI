@@ -16,13 +16,25 @@
 `~/.claude/CLAUDE.md` というファイル名は Claude Code が読む固定名のため変更できない。
 repo 側はツール中立な `AGENTS.md` を正式名とする。
 
-**repo 側はツール中立を保つ**ため、`agent/AGENTS.md` には**共通本文（§0〜§12）のみ**を置く。
-各ツール固有の末尾ブロックは repo に写さない：
+**repo 側はツール中立・マシン中立を保つ**。個別環境に属する設定は repo に写さない。
+
+### AGENTS.md
+
+`agent/AGENTS.md` には**共通本文（§0〜§12）のみ**を置き、各ツール固有の末尾ブロックは写さない：
 
 - `~/.claude/CLAUDE.md` → 末尾に `@RTK.md`（インクルード指令）
 - `~/.codex/AGENTS.md` → 末尾に `## RTK - Rust Token Killer（Codex CLI）` セクション
 
 したがって共通本文の行数（現在 521 行）までが 3 者で byte 単位に同一であること。
+
+### settings.json
+
+`agent/settings.json` には**全マシン共通の設定のみ**を置く。以下は**個別（マシンローカル）設定**
+として実体側 `~/.claude/settings.json` にのみ存在し、repo には写さない：
+
+- `hooks`（`rtk hook claude` などツール／マシン依存の hook 一式）
+
+したがって `hooks` 以外のキーが 2 者で一致していること。
 
 ## 同期の確認
 
@@ -30,7 +42,9 @@ repo 側はツール中立な `AGENTS.md` を正式名とする。
 LINES=$(wc -l < agent/AGENTS.md)
 diff <(head -$LINES ~/.claude/CLAUDE.md)  agent/AGENTS.md
 diff <(head -$LINES ~/.codex/AGENTS.md)   agent/AGENTS.md
-diff ~/.claude/settings.json agent/settings.json
+
+# settings.json は hooks を除いて比較
+diff <(jq 'del(.hooks)' ~/.claude/settings.json) <(jq 'del(.hooks)' agent/settings.json)
 ```
 
 差分が出た場合は、**実体側（`~/.claude/`）を正**として本ディレクトリへ写す。

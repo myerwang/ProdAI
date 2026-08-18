@@ -2,25 +2,10 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $HOME/.claude/hooks/auto-sync-config.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  },
   "enabledPlugins": {
     "claude-hud@claude-hud": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-hud": {
@@ -30,9 +15,8 @@
       }
     }
   },
-  "effortLevel": "max",
+  "effortLevel": "high",
   "tui": "fullscreen",
   "theme": "dark",
-  "skipAutoPermissionPrompt": true,
-  "model": "claude-fable-5[1m]"
+  "skipAutoPermissionPrompt": true
 }
