@@ -302,6 +302,32 @@ AI が誤って業務情報を持ち込んだ場合:
 
 ---
 
+## 账号绑定
+
+グローバル規則 §2.1 / §7.2 が要求する固定セクション。見出し名は規則側で固定キーのため
+そのまま（中国語表記）を用い、本文は本リポジトリの言語（日本語）で記す。
+
+**実メールアドレスは書かない**（§1 絶対禁止 5）。GitHub の noreply 形式を用いることで
+「唯一 ID 粒度の宣言」と「個人情報を public repo に残さない」を両立させる。
+
+| 種別 | 値 |
+|---|---|
+| GitHub リポジトリ | `github.com/myerwang/ProdAI`（**PUBLIC**） |
+| GitHub アカウント | `myerwang` / user id **`7298618`** |
+| git author / committer | `myerwang <7298618+myerwang@users.noreply.github.com>` |
+| 設定スコープ | 本リポジトリ限定（`git config --local`）。global `~/.gitconfig` は変更しない |
+
+- git author は GitHub 公式の **noreply 形式**
+  （`<user-id>+<login>@users.noreply.github.com`）を使用する。実メールを public な
+  commit 履歴に残さないための GitHub の標準的な慣行であり、commit は GitHub 上で
+  正しく `myerwang` に紐付く。
+- push 前に必ずグローバル §7.4 の照合を行う:
+  `gh api user --jq .id` の結果と上表の user id を**逐字比較**し、一致した場合のみ push。
+- 2026-08-18 より前の 31 commit は旧 author 設定（実メール）で記録済み。
+  履歴改写は**未実施**（force push はグローバル §10.2 により user の明示確認が必要）。
+
+---
+
 ## 10. このファイル自身の更新
 
 `.claude/CLAUDE.md`（本ファイル）の更新ルール:
@@ -319,3 +345,7 @@ AI が誤って業務情報を持ち込んだ場合:
 - **2026-05-23**: §2.3「認知済み多形式タクソノミーは最初からフォルダ + 全収録（table 方式）」
   を追加。user 指示: JWT 等は単発 `jwt.md` ではなく `auth/` を立て session / JWT /
   OAuth2-OIDC / API key / WebAuthn 等を一気に全収録する（散発の小出し禁止、§0 一次到位）。
+- **2026-08-18**: 「## 账号绑定」セクションを追加（グローバル規則 §2.1 / §7.2 準拠）。
+  併せて本リポジトリの git author を GitHub noreply 形式
+  `7298618+myerwang@users.noreply.github.com` に変更（`git config --local` のみ、
+  global は不変更）。user 指示による。
