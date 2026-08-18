@@ -25,7 +25,7 @@ repo 側はツール中立な `AGENTS.md` を正式名とする。
 - `~/.claude/CLAUDE.md` → 末尾に `@RTK.md`（インクルード指令）
 - `~/.codex/AGENTS.md` → 末尾に `## RTK - Rust Token Killer（Codex CLI）` セクション
 
-したがって共通本文の行数（現在 591 行）までが 3 者で byte 単位に同一であること。
+したがって共通本文の行数（現在 595 行）までが 3 者で byte 単位に同一であること。
 
 ### settings.json
 
