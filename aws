@@ -1,0 +1,539 @@
+请读取我提供的两份材料：
+
+1. AWS整体架构图
+2. 安全设计书
+
+如果材料是图片、PDF、Visio、Excel或其他格式，请完整检查所有页面、图例、注释和附表。以原文件为事实来源；若文件内容与下面的背景描述冲突，以文件为准，并明确列出冲突。不要修改原文件。
+
+背景架构大致为：
+
+- 三个外部上游系统每日通过SFTP向AWS传输数据
+- 文件落入Amazon S3
+- Informatica负责数据清洗和转换
+- 清洗后的数据写入Snowflake
+- 下游包括Salesforce Data 360、Marketing Cloud、Service Cloud和Tableau
+- Informatica与Snowflake可能由外部合作公司实施，目前不能预设最终部署方式
+- 希望先完成一条最小但完整、可验证的真实链路，解决架构停留在纸面的问题
+- 试跑过程中持续补充部署包，并进行双向验证：
+  1. 从设计到部署：验证架构图和安全设计是否真的可实施
+  2. 从部署到设计：根据真实配置、运行结果和发现的问题反向修正设计
+- 最终从验证通过的部署包、运行证据和设计依据中形成详细设计、配置、测试及运维文档
+
+你的任务只限于生成计划书，不要执行任何AWS、Informatica、Snowflake、Salesforce或Tableau写操作，不要订阅服务，不要创建云资源。
+
+请在当前工作目录生成一份Markdown文件，推荐文件名：
+
+`架构最小闭环部署验证计划.md`
+
+如有更准确、专业且不冗长的名称，可以优化，但必须突出“最小闭环、可部署性、双向验证”三个核心概念。
+
+计划书面向架构师、安全团队、AWS实施方、Informatica合作公司、Snowflake合作公司、Salesforce/Tableau实施方、业务负责人和项目管理人员。正文使用清晰、正式的中文；技术术语首次出现时同时给出英文名称。
+
+开始编写前：
+
+1. 先从架构图提取所有组件、数据流、系统边界、信任边界和外部依赖。
+2. 从安全设计书提取身份、权限、加密、网络、日志、数据分类、密钥、审计、保留期限和合规要求。
+3. 区分以下状态，不允许把未知内容写成既定事实：
+   - 已由材料确认
+   - 根据材料推导
+   - 待各方确认
+   - 当前存在冲突
+4. 对Informatica、Snowflake及相关AWS服务的现行部署能力，只使用供应商官方文档或AWS官方文档核验；附直接链接和查询日期。
+5. 不得自行决定Informatica使用Hosted Agent、Serverless Runtime还是EC2 Secure Agent。
+6. 不得自行决定Snowflake的采购方式、Edition、公网TLS、AWS PrivateLink、SQL还是Terraform实施方式。
+7. 不得默认AWS Marketplace订阅等于在客户AWS账号中部署EC2。
+8. 不得把密码、Access Key、Private Key、Token或其他Secret写入计划书、参数文件示例或部署包。
+9. 若材料信息不足，不要停止工作；完成整份计划，并把缺失内容放入“待确认事项与决策门”。
+10. 计划应采用最小必要方案，避免为未来可能需求提前引入复杂平台、Custom Resource或自建编排框架。
+
+计划书必须包含以下章节，并根据两份材料填充实际内容。
+
+# 1. 文档目的
+
+说明本计划用于：
+
+- 将纸面架构转化为可执行、可验证的最小部署闭环
+- 尽早发现架构、安全、账号、权限、网络、产品许可和费用问题
+- 验证每个系统之间的真实连接和数据流
+- 建立“设计—部署—验证—修正—再验证”的闭环
+- 为后续详细设计书、配置表、测试文档和运维文档提供事实依据
+- 明确本计划不是生产上线计划，也不是完整性能或灾备验收
+
+# 2. 范围与非范围
+
+分别列出：
+
+- 本次Pilot包含的系统和链路
+- 暂不包含的生产能力
+- 使用合成或脱敏测试数据的要求
+- 不允许在Pilot中处理的真实敏感数据
+- 哪些内容必须在试跑前完成
+- 哪些内容允许在试跑中逐步补充
+- 哪些内容必须在正式上线前完成
+
+# 3. 输入材料与基线
+
+建立输入基线表，至少包括：
+
+- 架构图文件名、版本、日期和负责人
+- 安全设计书文件名、版本、日期和负责人
+- 已确认的账号、Region、Tenant、Organization及环境
+- 已知的数据接口和样例
+- 已知约束
+- 缺失信息
+- 当前基线版本
+
+说明每次试跑必须绑定：
+
+- Git Commit或部署包版本
+- CloudFormation Stack ID
+- Snowflake变更版本
+- Informatica Export Package校验值
+- 测试Batch ID
+- 验证时间
+
+# 4. 当前架构理解
+
+根据实际架构图生成：
+
+- 系统组件表
+- 数据流表
+- 系统边界表
+- 信任边界表
+- 账号与控制面表
+- 外部依赖表
+
+明确区分：
+
+- AWS控制面
+- Informatica IDMC控制面
+- Snowflake控制面
+- Salesforce Data 360、Marketing Cloud、Service Cloud控制面
+- Tableau控制面
+
+加入一张简洁的Mermaid图，表示当前架构和最小验证链路。
+
+# 5. 最小闭环定义
+
+给出最小闭环的精确定义和成功标准。
+
+优先采用以下分段顺序，但必须结合实际架构图调整：
+
+1. S3 → Informatica → Snowflake
+2. SFTP → S3
+3. Snowflake → Tableau
+4. Snowflake → Data 360
+5. Data 360 → Marketing Cloud / Service Cloud
+6. 完整每日批次端到端试跑
+
+每一段都要说明：
+
+- 前置条件
+- 输入
+- 部署内容
+- 操作步骤
+- 预期输出
+- 验证方法
+- 失败判定
+- 回退或停止方式
+- 产生的证据
+- 是否允许进入下一段的退出标准
+
+说明为什么先验证核心数据链路，再逐步增加入口和下游，以便快速定位问题。
+
+# 6. 部署包设计
+
+明确说明不存在一个纯AWS文件可以原生部署全部外部SaaS。
+
+定义推荐部署包结构，例如：
+
+pilot-deployment/
+├── deployment.yaml
+├── aws/
+│   ├── template.yaml
+│   └── parameters-pilot.json
+├── snowflake/
+│   └── bootstrap.sql 或 Terraform配置
+├── informatica/
+│   ├── pilot-export.zip
+│   └── target-mapping.json
+├── test/
+│   ├── input.csv
+│   └── expected-result.json
+└── evidence/
+    └── 运行证据
+
+逐项说明：
+
+- 文件责任
+- 维护方
+- 审批方
+- 是否包含敏感信息
+- 如何验证
+- 如何版本化
+- 如何回退
+- 是否可自动部署
+- 哪些内容必须人工确认
+
+AWS部分优先使用CloudFormation YAML；说明CloudFormation可以实现配置等价部署，但自动生成的ARN、Endpoint、ENI ID等物理标识可能不同。
+
+列出AWS CloudFormation应覆盖和暂不应覆盖的资源。尚未确定Informatica Runtime之前，不得提前创建EC2、NAT Gateway、跨账号ENI或其他可能闲置计费的资源。
+
+# 7. Informatica部署方式确认
+
+不要代替合作公司选择方案。建立正式的方案确认表，对比：
+
+- Hosted Agent
+- Serverless Runtime
+- Secure Agent on EC2
+- 其他由合作公司提出的受支持方式
+
+每个方案至少比较：
+
+- SaaS控制面位置
+- 数据运行位置
+- 是否需要客户EC2
+- 是否需要VPC、Subnet、Security Group、ENI、NAT Gateway或VPC Endpoint
+- S3 Connector支持情况
+- Snowflake Connector支持情况
+- 支持的认证方式
+- Connector名称和版本
+- 数据是否离开客户网络
+- 高可用方式
+- 日志与审计
+- 扩缩方式
+- 运维责任
+- License、IPU、Compute Unit和AWS费用
+- 零任务时是否收费
+- 最大并发和任务超时
+- 一键停止方式
+- 部署和卸载方式
+- 合作公司必须提供的证据
+
+设置决策门：合作公司提交方案、官方依据、费用、安全影响和恢复方案，经客户确认后才能实施。
+
+# 8. Snowflake实施方式确认
+
+建立正式确认表，至少包括：
+
+- Snowflake Organization和Account
+- Cloud Provider
+- Region
+- Edition
+- 直接采购或AWS Marketplace
+- AWS Marketplace仅承担采购/计费还是包含其他交付
+- 公网TLS或AWS PrivateLink
+- PrivateLink对Edition和费用的影响
+- Warehouse数量、大小、Auto Suspend和Auto Resume
+- Resource Monitor及硬性暂停阈值
+- Database、Schema、Table、Role和Grant
+- Informatica服务账号认证方式
+- Key Pair轮换
+- SQL部署或Snowflake Terraform Provider
+- 备份、恢复和回退方法
+- 合作公司必须交付的SQL、Terraform、对象清单和执行证据
+
+明确Snowflake是托管SaaS，不是在客户AWS账号中部署Snowflake EC2。
+
+# 9. 账号、身份和权限前置闸门
+
+明确以下内容不能等试跑失败后再补：
+
+- 目标AWS Account ID
+- AWS Region
+- 项目专属Profile或IAM Identity Center Role
+- 当前实际身份查询与预期账号逐字比对
+- Informatica Organization ID和角色
+- Snowflake Organization、Account和Role
+- Salesforce Org和Sandbox
+- Tableau Site或Project
+- 部署身份与运行身份分离
+- 合作公司使用可审计身份，不共享个人管理员账号
+- Secret存储和轮换方式
+
+允许根据明确的AccessDenied细化最小权限，但禁止先授予Administrator权限再在试跑后收紧。
+
+输出一份待确认账号清单和最小权限矩阵模板。
+
+# 10. 最小安全配置
+
+结合安全设计书逐项映射：
+
+- 测试数据分类
+- S3 Block Public Access
+- 静态和传输中加密
+- KMS或默认加密选择
+- SFTP SSH Key管理
+- S3 Prefix隔离
+- IAM最小权限
+- Snowflake RBAC
+- Informatica连接权限
+- Salesforce和Tableau只读/写入边界
+- 日志脱敏
+- CloudTrail、CloudWatch和供应商审计日志
+- 密钥与Secret不进入部署包
+- 公网与私网连接决策
+- 数据保留和Pilot清理
+- 安全验证证据
+
+生成“安全设计要求—部署配置—验证方法—证据位置”的追踪矩阵。
+
+# 11. 数据和接口验证
+
+至少覆盖：
+
+- 文件命名
+- 目录和Prefix
+- 编码与分隔符
+- Schema版本
+- Batch ID
+- Manifest或完成标记
+- Record Count
+- Checksum
+- 主键
+- 重复文件
+- 重复批次
+- 空文件
+- 错误文件
+- 缺列、多列和类型错误
+- 迟到、缺失和补发
+- Informatica中途失败
+- Snowflake写入部分失败
+- 下游不可用
+- 幂等重跑
+- 源、目标和下游行数对账
+
+# 12. 费用控制计划
+
+所有潜在计费点必须列出：
+
+- AWS Transfer Family
+- S3
+- CloudWatch
+- CloudTrail Data Events
+- KMS
+- NAT Gateway
+- Interface VPC Endpoint
+- EC2 Secure Agent
+- Informatica License/IPU/Serverless Compute Unit
+- Snowflake Compute、Storage和Data Transfer
+- Snowflake PrivateLink
+- Data 360
+- Marketing Cloud
+- Tableau
+
+每项必须包含：
+
+- 计费模型
+- 零使用时费用
+- Pilot预计费用
+- 正常月费估算
+- 失控情况下的费用上界
+- 是否有天然硬上限
+- 预算告警
+- 最大并发
+- 最大重试
+- 超时
+- 自动暂停
+- 熔断或停止方法
+- Pilot资源保留或删除日期
+- 费用负责人和审批人
+
+无法从材料得到价格时标为待供应商报价，不得自行编造。
+
+# 13. 分段实施计划
+
+按顺序给出可执行计划：
+
+- 阶段目标
+- 参与方
+- 前置条件
+- 具体步骤
+- 部署文件
+- 审批点
+- 验证项
+- 输出证据
+- 退出条件
+- 回退条件
+- 下一阶段依赖
+
+不得写成泛泛的“配置、测试、上线”；每一步要能被实施人员直接执行或据此编写部署命令。
+
+# 14. 双向验证闭环
+
+详细定义两个方向。
+
+设计到部署：
+
+- 每条架构和安全要求必须映射到部署资源、参数或控制项
+- 每项必须有测试方法和证据
+- 无法射的要求不得视为已实现
+
+部署到设计：
+
+- 从CloudFormation Outputs、实际资源、Snowflake对象、Informatica资产和运行日志提取真实配置
+- 与架构图和安全设计逐项比对
+- 发现差异后判断是部署错误、设计遗漏还是设计错误
+- 更新部署包或设计书
+- 重新部署并验证
+- 禁止只改控制台或只改文档
+
+加入闭环流程图：
+
+设计基线
+→ 部署包
+→ Change Set或变更计划
+→ 部署
+→ 试跑
+→ 证据采集
+→ 差异分析
+→ 更新部署包或设计
+→ 再验证
+→ 冻结版本
+
+# 15. 变更、版本与配置漂移管理
+
+定义：
+
+- 部署包版本规则
+- 每次试跑的版本编号
+- 变更记录
+- 审批记录
+- 配置参数来源
+- CloudFormation Drift Detection
+- Snowflake对象差异检查
+- Informatica Export Package校验值
+- 手工操作记录
+- 禁止无记录控制台修改
+- 通过版本的冻结标准
+
+# 16. 验收标准
+
+至少包括：
+
+- 所有分段测试通过
+- 完整Batch可端到端运行
+- 输入和输出行数可对账
+- 重复执行不产生重复数据
+- 错误数据进入隔离路径
+- 失败可以停止和恢复
+- 所有身份可审计
+- Secret未进入部署包
+- 日志可关联同一个Batch ID
+- 费用未超过Pilot上限
+- 实际配置与设计追踪矩阵一致
+- 所有待确认事项已关闭或获得正式例外批准
+
+# 17. 文档产出清单
+
+按“试跑前、试跑中、试跑后”列出会产生的文档，并说明来源、负责人和完成条件。
+
+至少包含：
+
+试跑前：
+- 最小闭环部署验证计划
+- 部署方式确认表
+- 账号与环境绑定表
+- 数据接口与测试数据说明
+- 最小权限矩阵
+- Pilot费用估算与预算上限
+- 部署包清单
+
+试跑中：
+- 部署记录
+- CloudFormation Change Set
+- 实际资源与输出参数清单
+- Informatica导入和Job记录
+- Snowflake对象及Query记录
+- 问题与差异台账
+- 权限调整记录
+- 费用使用记录
+- 分段测试证据
+
+试跑后：
+- 最终架构图
+- AWS详细设计书
+- 安全详细设计书及追踪矩阵
+- Informatica实施设计书
+- Snowflake实施设计书
+- 参数与配置表
+- 接口设计书
+- 权限设计书
+- 测试规格书
+- 测试结果报告
+- 运维手册
+- 失败恢复与重跑手册
+- 成本设计和预算基线
+- 竣工配置文档（As-Built Documentation）
+- 未解决风险与正式上线前整改清单
+
+特别说明每份最终文档应从哪些已验证部署包文件和运行证据生成，避免重复手工抄写。
+
+# 18. 角色与责任
+
+制作RACI或等价责任矩阵，至少覆盖：
+
+- 客户架构负责人
+- 客户安全负责人
+- AWS实施方
+- Informatica合作公司
+- Snowflake合作公司
+- Salesforce实施方
+- Tableau实施方
+- 业务数据Owner
+- 项目经理
+- 费用审批人
+- 运维负责人
+
+明确合作公司负责提出实施方式和提供官方依据，客户负责确认账号、安全边界、费用和最终方案。
+
+# 19. 待确认事项与决策门
+
+集中列出所有未知项，每项必须包含：
+
+- 问题
+- 当前已知信息
+- 可选方案
+- 推荐方案或判断原则
+- 决策责任人
+- 最晚确认时间点
+- 不确认的影响
+- 所需证据
+- 是否阻塞后续部署
+
+尤其突出：
+
+- Informatica Runtime
+- Snowflake Region和Edition
+- Marketplace采购方式
+- 公网TLS或PrivateLink
+- SFTP推送或拉取
+- 测试AWS账号
+- 测试数据分类
+- Pilot费用上限
+- 合作公司访问方式
+- Pilot结束后的资源清理方式
+
+# 20. 最终执行检查表
+
+在文末提供可勾选的检查表，分为：
+
+- 开始前
+- 每段部署前
+- 每段部署后
+- 完整试跑前
+- 完整试跑后
+- 版本冻结前
+- 文档生成前
+
+输出要求：
+
+- 只生成一份完整、可直接评审的Markdown计划书。
+- 不生成云资源，不执行部署。
+- 不虚构账号、Region、费用、许可证或权限。
+- 所有未知值使用统一的`待确认`标记。
+- 所有关键结论注明来自架构图、安全设计书、官方资料或推导。
+- 使用表格和检查表提高可执行性。
+- 文档必须形成完整计划，不能只是问题清单。
+- 结尾给出“可以开始Pilot”的明确准入条件。
+- 完成后报告生成文件的绝对路径。
