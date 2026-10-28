@@ -37,6 +37,10 @@ handbook for AI to read**:
 ProdAI/
 ├── README.md / README.ja.md / README.en.md   # Tri-lingual intro (always in sync)
 ├── AGENTS.md                                  # AI behavior rules (must read)
+├── agent/                                     # Global operating rules: resident entry + on-demand domains
+│   ├── AGENTS.md
+│   ├── on-demand/
+│   └── README.md
 ├── CONTRIBUTING.md                            # Acceptance standards
 ├── table/                                     # Table design patterns (8 forms)
 │   ├── README.md                              # Index + decision tree

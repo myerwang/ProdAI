@@ -35,6 +35,10 @@ ProdAI はチュートリアルでも awesome リストでもない。**AI** が
 ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三語簡介（常に同期）
 ├── AGENTS.md                                  # AI 行動規則（必読）
+├── agent/                                     # 共通行動規則：常駐入口 + オンデマンド規則
+│   ├── AGENTS.md
+│   ├── on-demand/
+│   └── README.md
 ├── CONTRIBUTING.md                            # 内容収録基準
 ├── table/                                     # テーブル設計パターン（8 形式）
 │   ├── README.md                              # 索引 + 判断ツリー

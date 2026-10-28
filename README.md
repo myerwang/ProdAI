@@ -32,6 +32,10 @@ ProdAI 不是教程，也不是 awesome 列表。它是给 **AI** 看的「生�
 ProdAI/
 ├── README.md / README.ja.md / README.en.md   # 三语简介（必须同步）
 ├── AGENTS.md                                  # AI 行为规则（必读）
+├── agent/                                     # 全局行为规则：常驻入口 + 按需专项文件
+│   ├── AGENTS.md
+│   ├── on-demand/
+│   └── README.md
 ├── CONTRIBUTING.md                            # 内容收录标准
 ├── table/                                     # 表格设计模式（8 种形式）
 │   ├── README.md                              # 索引 + 决策树
